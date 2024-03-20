@@ -15,5 +15,9 @@ application = Flask(__name__)
 application.register_blueprint(details_blueprint)
 application.register_blueprint(main_blueprint)
 
+@application.route("/")
+def ping():
+    return "hello!", 200
+
 if __name__ == "__main__":
     application.run()
