@@ -16,6 +16,9 @@ def details():
             "message": "You've send some cringe."
         }), 400
 
-    data = MoexAPI().get_return_for_ticker("SBER")
+    tickers = MoexAPI().get_tickers()
+    for ticker in tickers:
+        print(ticker)
+        print(MoexAPI().get_last_data_for_ticker(ticker))
 
-    return data, 200
+    return "hello", 200

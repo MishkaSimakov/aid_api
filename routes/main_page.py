@@ -21,13 +21,22 @@ def main():
     if data["category"] not in CategoriesConfig.categories:
         return with_error("Wrong category type")
 
+    with open("storage/last_data") as storage:
+        values = json.loads(storage.readline())
+
     category = CategoriesConfig.categories[data["category"]]
-    values = {}
-    for company in CategoriesConfig.companies:
-        values[company] = category.calculator(company)
+    # values = {}
+    # for company in CategoriesConfig.companies:
+    #     values[company] = category.calculator(company)
+
+    result = {}
+    for company in values:
+        result[company] = {
+            "value": values[company]["return"] * 100
+        }
 
     return json.dumps({
         "message": "Success!",
-        "items": values,
+        "items": result,
         "postfix": category.postfix
     }), 200

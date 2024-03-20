@@ -14,5 +14,5 @@ class Category:
 class CategoriesConfig:
     companies = ["SBER", "ROSN", "VTB", "TCSG", "OZON", "FIVE", "SFIN", "PLZL", "CRTX", "STZ", "UBER"]
     categories = {
-        "percentage": Category("%", percentage.calculate_return)
+        "return": Category("%", percentage.calculate_return)
     }
