@@ -1,29 +1,29 @@
 from moex_api import MoexAPI
 import json
+import logging
+from finance_calculations import FinancialCalculator
 
 
 def tickers_data_loader():
-    print("Loading last tickers data...")
-    # try:
-    tickers = MoexAPI().get_tickers()
-    result = {}
+    logging.info("Start reloading tickers.")
 
-    for ticker in tickers:
-        ticker_data = MoexAPI().get_last_day_candles(ticker)
+    try:
+        tickers = MoexAPI().get_tickers()
+        result = {}
 
-        if len(ticker_data) == 0:
-            continue
+        for ticker in tickers:
+            calculator = FinancialCalculator(ticker)
 
-        curr_day = ticker_data[-1]
-        prev_day = ticker_data[0]
+            result[ticker] = {
+                "return": calculator.get_return(),
+                "dividends": calculator.get_dividends()
+            }
 
-        result[ticker] = {
-            "return": curr_day.close / prev_day.close - 1
-        }
+        with open("storage/last_data", "w") as storage:
+            storage.write(json.dumps(result))
 
-    with open("storage/last_data", "w") as storage:
-        storage.write(json.dumps(result))
+        logging.info("Loaded all tickers.")
+    except Exception as e:
+        logging.exception(e)
 
-    print("Loaded all tickers")
-    # except:
-    #     print("Loading failed, will try again next time")
+    logging.info("Finished loading tickers.")

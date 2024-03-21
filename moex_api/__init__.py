@@ -4,7 +4,7 @@ import apimoex
 import requests
 from datetime import datetime, timedelta, date
 from enum import Enum
-from typing import Dict
+from typing import Dict, Optional
 from dataclasses import dataclass
 
 
@@ -29,10 +29,20 @@ class Candle:
     begin: datetime
     end: datetime
 
+    @staticmethod
+    def from_array(data: list) -> 'Candle':
+        return Candle(data[0], data[1], data[2], data[3], data[4], data[5], datetime.fromisoformat(data[6]),
+                      datetime.fromisoformat(data[7]))
 
-def array_to_candle(data: list) -> Candle:
-    return Candle(data[0], data[1], data[2], data[3], data[4], data[5], datetime.fromisoformat(data[6]),
-                  datetime.fromisoformat(data[7]))
+
+@dataclass
+class TickerDividends:
+    value: float
+    close_date: datetime
+
+    @staticmethod
+    def from_array(data: list) -> 'TickerDividends':
+        return TickerDividends(data[0], datetime.fromisoformat(data[2]))
 
 
 def select_data_points(data: list, points: int = 30):
@@ -67,7 +77,7 @@ class MoexAPI:
 
     def get_candles(self, ticker: str, start_date: datetime, end_date: datetime, interval: StockDataInterval,
                     count: int = -1) \
-            -> list[Candle]:
+            -> Optional[list[Candle]]:
         url = f"engines/stock/markets/shares/boards/TQBR/securities/{ticker}/candles.json"
         params = {
             'from': start_date.strftime('%Y-%m-%d %H:%M:%S'),
@@ -84,9 +94,27 @@ class MoexAPI:
         if count != -1:
             candles = select_data_points(candles, count)
 
-        return list(map(array_to_candle, candles))
+        return list(map(Candle.from_array, candles))
 
-    def request_with_retry(self, url: str, params: Dict[str, str] = {}, retry_count: int = 3):
+    def get_dividends(self, ticker: str, period: timedelta) -> Optional[list[TickerDividends]]:
+        url = f"securities/{ticker}/dividends.json"
+        data = self.request_with_retry(url)
+
+        if not data:
+            return None
+
+        dividends = map(TickerDividends.from_array, data["dividends"]["data"])
+
+        end_date = datetime.now()
+        start_date = end_date - period
+        dividends = filter(lambda dividend: start_date <= dividend.close_date <= end_date, dividends)
+
+        return list(dividends)
+
+    def request_with_retry(self, url: str, params: Optional[Dict[str, str]] = None, retry_count: int = 3):
+        if params is None:
+            params = {}
+
         attempt_count = 0
         while attempt_count < retry_count:
             response = requests.get(f"{self.base_url}/{url}", params=params)
