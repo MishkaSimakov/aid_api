@@ -1,3 +1,5 @@
+import math
+
 import apimoex
 import requests
 from datetime import datetime, timedelta, date
@@ -33,12 +35,17 @@ def array_to_candle(data: list) -> Candle:
                   datetime.fromisoformat(data[7]))
 
 
-def select_data_points(data, points=30):
-    if not data or len(data) < points:
+def select_data_points(data: list, points: int = 30):
+    if not data:
         return []
-    step = len(data) // points
+    if len(data) < points:
+        return data
+    if points == 1:
+        return data[0]
 
-    return [data[i] for i in range(0, len(data), step)]
+    step = len(data) / points
+
+    return [data[math.ceil(step * i)] for i in range(points)]
 
 
 class MoexAPI:
