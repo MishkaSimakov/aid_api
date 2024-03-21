@@ -8,10 +8,10 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     steps:
-    - name: "Connect via SSH"
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.HOSTING_SSH_HOST }}
-        username: ${{ secrets.HOSTING_SSH_USERNAME }}
-        password: ${{ secrets.HOSTING_SSH_PASSWORD }}
-        script: cd www/ai-dashboard.site && git pull
+      - name: "Connect via SSH"
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOSTING_SSH_HOST }}
+          username: ${{ secrets.HOSTING_SSH_USERNAME }}
+          password: ${{ secrets.HOSTING_SSH_PASSWORD }}
+          script: ./deploy.sh

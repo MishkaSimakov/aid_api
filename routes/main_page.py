@@ -25,9 +25,6 @@ def main():
         values = json.loads(storage.readline())
 
     category = CategoriesConfig.categories[data["category"]]
-    # values = {}
-    # for company in CategoriesConfig.companies:
-    #     values[company] = category.calculator(company)
 
     result = {}
     for company in values:
@@ -36,7 +33,7 @@ def main():
         }
 
     return json.dumps({
-        "message": "Success!",
+        "message": "success",
         "items": result,
         "postfix": category.postfix
     }), 200
