@@ -2,7 +2,7 @@ from typing import Dict
 
 from flask import request
 import json
-from utils import with_error
+from utils import with_error, with_json_fields
 from config.categories import ChartConfig
 from datetime import datetime
 
@@ -21,19 +21,12 @@ def format_candle(candle: Candle) -> Dict[str, str]:
 
 
 @blueprint.route("/tickers/<ticker>/chart", methods=["POST"])
+@with_json_fields(["period"])
 def chart(ticker: str):
-    content_type = request.headers.get('Content-Type')
-
-    if content_type != 'application/json':
-        return with_error("You've send some cringe.")
-
-    if "period" not in request.json:
-        return with_error("Period must be specified.")
-
     period = request.json["period"]
 
     if period not in ChartConfig.periods:
-        return with_error("Interval is not supported.")
+        return with_error(f"Period is not supported. Supported periods are: {', '.join(ChartConfig.periods.keys())}.")
 
     end_date = datetime.now()
     start_date = end_date - ChartConfig.periods[period]["delta"]

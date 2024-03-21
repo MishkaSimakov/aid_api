@@ -22,6 +22,10 @@ class ChartConfig:
             "delta": timedelta(days=1),
             "interval": StockDataInterval.TEN_MINUTES
         },
+        "1M": {
+            "delta": timedelta(days=30),
+            "interval": StockDataInterval.DAY
+        },
         "1Y": {
             "delta": timedelta(days=365),
             "interval": StockDataInterval.WEEK

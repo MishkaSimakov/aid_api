@@ -3,28 +3,22 @@ import json
 from flask import Blueprint
 
 from config.categories import CategoriesConfig
-from utils import with_error
+from utils import with_error, with_json_fields
 
 blueprint = Blueprint('main', __name__)
 
 
 @blueprint.route("/", methods=["POST"])
+@with_json_fields(["category"])
 def main():
-    content_type = request.headers.get('Content-Type')
-
-    if content_type != 'application/json':
-        return with_error("Wrong content type")
-
-    data = request.json
-    if "category" not in data:
-        return with_error("There must be category field")
-    if data["category"] not in CategoriesConfig.categories:
+    category = request.json["category"]
+    if category not in CategoriesConfig.categories:
         return with_error("Wrong category type")
 
     with open("storage/last_data") as storage:
         values = json.loads(storage.readline())
 
-    category = CategoriesConfig.categories[data["category"]]
+    category = CategoriesConfig.categories[category]
 
     result = {}
     for company in values:
