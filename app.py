@@ -5,11 +5,12 @@ from routes.main_page import blueprint as main_blueprint
 from moex_api.tickers_data_loader import tickers_data_loader
 from apscheduler.schedulers.background import BackgroundScheduler
 import logging
+from datetime import datetime
 
 logging.basicConfig(filename="storage/debug.log", level=logging.DEBUG)
 
 scheduler = BackgroundScheduler(daemon=True)
-scheduler.add_job(tickers_data_loader, 'interval', minutes=10)
+scheduler.add_job(tickers_data_loader, 'interval', minutes=10, start_date=datetime.now())
 scheduler.start()
 
 tickers_data_loader()
