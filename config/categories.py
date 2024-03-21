@@ -28,4 +28,7 @@ class CategoriesConfig:
         "return": {
             "postfix": "%"
         },
+        "dividends": {
+            "postfix": "₽"
+        }
     }

@@ -14,9 +14,15 @@ def tickers_data_loader():
         for ticker in tickers:
             calculator = FinancialCalculator(ticker)
 
+            return_value = calculator.get_return()
+            dividends_value = calculator.get_dividends()
+
+            if return_value is None or dividends_value is None:
+                continue
+
             result[ticker] = {
-                "return": calculator.get_return(),
-                "dividends": calculator.get_dividends()
+                "return": return_value,
+                "dividends": dividends_value
             }
 
         with open("storage/last_data", "w") as storage:
