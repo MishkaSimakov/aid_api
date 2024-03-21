@@ -23,11 +23,11 @@ def main():
     result = {}
     for company in values:
         result[company] = {
-            "value": values[company]["return"] * 100
+            "value": values[company][category] * 100
         }
 
     return json.dumps({
         "message": "success",
         "items": result,
-        "postfix": category.postfix
+        "postfix": category["postfix"]
     }), 200

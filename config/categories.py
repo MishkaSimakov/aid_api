@@ -1,16 +1,5 @@
-from typing import Callable
-from finance_calculations import percentage
 from datetime import timedelta
 from moex_api import StockDataInterval
-
-
-class Category:
-    postfix: str
-    calculator: Callable[[str], float]
-
-    def __init__(self, postfix: str, calculator: Callable[[str], float]):
-        self.postfix = postfix
-        self.calculator = calculator
 
 
 class ChartConfig:
@@ -36,5 +25,7 @@ class ChartConfig:
 
 class CategoriesConfig:
     categories = {
-        "return": Category("%", percentage.calculate_return)
+        "return": {
+            "postfix": "%"
+        },
     }

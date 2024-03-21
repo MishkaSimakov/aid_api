@@ -42,7 +42,7 @@ class TickerDividends:
 
     @staticmethod
     def from_array(data: list) -> 'TickerDividends':
-        return TickerDividends(data[0], datetime.fromisoformat(data[2]))
+        return TickerDividends(data[3], datetime.fromisoformat(data[2]))
 
 
 def select_data_points(data: list, points: int = 30):
