@@ -18,7 +18,7 @@ def tickers_data_loader():
         prev_day = ticker_data[0]
 
         result[ticker] = {
-            "return": (curr_day.close / prev_day.close - 1) * 100
+            "return": curr_day.close / prev_day.close - 1
         }
 
     with open("storage/last_data", "w") as storage:
