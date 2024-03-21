@@ -3,6 +3,7 @@ from finance_calculations import percentage
 from datetime import timedelta
 from moex_api import StockDataInterval
 
+
 class Category:
     postfix: str
     calculator: Callable[[str], float]
@@ -24,7 +25,7 @@ class ChartConfig:
         },
         "1M": {
             "delta": timedelta(days=30),
-            "interval": StockDataInterval.DAY
+            "interval": StockDataInterval.HOUR
         },
         "1Y": {
             "delta": timedelta(days=365),

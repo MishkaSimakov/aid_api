@@ -53,13 +53,10 @@ class MoexAPI:
             return [x[0] for x in data]
 
     def get_last_day_candles(self, ticker: str) -> list[Candle]:
-        today = date.today()
-        start_of_today = datetime(today.year, today.month, today.day)
+        end_date = datetime.now()
+        start_date = (end_date - timedelta(days=1)).replace(hour=0, minute=0, second=0)
 
-        start_date = start_of_today - timedelta(days=1)
-        end_date = start_of_today
-
-        return self.get_candles(ticker, start_date, end_date, StockDataInterval.HOUR)
+        return self.get_candles(ticker, start_date, end_date, StockDataInterval.DAY)
 
     def get_candles(self, ticker: str, start_date: datetime, end_date: datetime, interval: StockDataInterval,
                     count: int = -1) \

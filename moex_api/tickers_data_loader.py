@@ -14,11 +14,11 @@ def tickers_data_loader():
         if len(ticker_data) == 0:
             continue
 
-        prev_day_start_row = ticker_data[0]
-        prev_day_end_row = ticker_data[-1]
+        curr_day = ticker_data[-1]
+        prev_day = ticker_data[0]
 
         result[ticker] = {
-            "return": (prev_day_end_row.close - prev_day_start_row.open) / prev_day_start_row.open
+            "return": (curr_day.close / prev_day.close - 1) * 100
         }
 
     with open("storage/last_data", "w") as storage:
