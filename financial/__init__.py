@@ -1,6 +1,4 @@
 import math
-
-import apimoex
 import requests
 from datetime import datetime, timedelta, date
 from enum import Enum
@@ -61,13 +59,15 @@ def select_data_points(data: list, points: int = 30):
 class MoexAPI:
     base_url = "https://iss.moex.com/iss"
 
-    def get_tickers(self):
+    def get_tickers(self) -> Optional[list[str]]:
         url = f"statistics/engines/stock/markets/index/analytics/IMOEX/tickers.json"
+        return [x[0] for x in self.request_with_retry(url)["tickers"]["data"]]
 
-        data = self.request_with_retry(url)["tickers"]["data"]
+    def get_ticker_info(self, ticker: str) -> Optional[list]:
+        url = f"securities/{ticker}.json"
+        data = self.request_with_retry(url)["description"]["data"]
 
-        if data:
-            return [x[0] for x in data]
+        return data
 
     def get_last_day_candles(self, ticker: str) -> list[Candle]:
         end_date = datetime.now()
@@ -112,6 +112,7 @@ class MoexAPI:
         return list(dividends)
 
     def request_with_retry(self, url: str, params: Optional[Dict[str, str]] = None, retry_count: int = 3):
+        print("Requesting: " + url)
         if params is None:
             params = {}
 

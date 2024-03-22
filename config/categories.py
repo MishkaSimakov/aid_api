@@ -1,5 +1,5 @@
 from datetime import timedelta
-from moex_api import StockDataInterval
+from financial import StockDataInterval
 
 
 class ChartConfig:

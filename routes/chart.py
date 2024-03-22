@@ -2,12 +2,12 @@ from typing import Dict
 
 from flask import request
 import json
-from utils import with_error, with_json_fields
+from utils import with_error, with_json_fields, with_success
 from config.categories import ChartConfig
 from datetime import datetime
 
 from flask import Blueprint
-from moex_api import MoexAPI, Candle
+from financial import MoexAPI, Candle
 
 blueprint = Blueprint('chart', __name__)
 
@@ -33,7 +33,6 @@ def chart(ticker: str):
     interval = ChartConfig.periods[period]["interval"]
     data = MoexAPI().get_candles(ticker, start_date, end_date, interval, count=30)
 
-    return json.dumps({
-        "message": "success",
+    return with_success({
         "items": list(map(format_candle, data))
-    }), 200
+    })

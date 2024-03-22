@@ -1,9 +1,12 @@
+import logging
+
 from flask import request
 import json
 from flask import Blueprint
+from financial.ticker import Ticker
 
 from config.categories import CategoriesConfig
-from utils import with_error, with_json_fields
+from utils import with_error, with_json_fields, with_success
 
 blueprint = Blueprint('main', __name__)
 
@@ -12,22 +15,27 @@ blueprint = Blueprint('main', __name__)
 @with_json_fields(["category"])
 def main():
     category_name = request.json["category"]
-    if category_name not in CategoriesConfig.categories:
-        return with_error("Wrong category type")
+    if category_name not in Ticker.categories_list:
+        return with_error(f"Wrong category type. Available categories: {', '.join(Ticker.categories_list.keys())}")
 
-    with open("storage/last_data") as storage:
-        values = json.loads(storage.readline())
+    try:
+        with open("storage/last_data") as storage:
+            values = json.loads(storage.readline())
+    except Exception as e:
+        logging.exception(e)
+        return with_error("Something wrong with internal files.", 500)
 
-    category = CategoriesConfig.categories[category_name]
+    category = Ticker.categories_list[category_name]
 
     result = {}
-    for company in values:
-        result[company] = {
-            "value": values[company][category_name] * 100
+    tickers_data = values["tickers"]
+    for ticker in tickers_data:
+        result[ticker] = {
+            "value": values["tickers"][ticker][category_name]
         }
 
-    return json.dumps({
-        "message": "success",
+    return with_success({
         "items": result,
+        "updated_at": values["updated_at"],
         "postfix": category["postfix"]
-    }), 200
+    })

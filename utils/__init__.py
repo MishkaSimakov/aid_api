@@ -1,12 +1,18 @@
 import json
 from functools import wraps
-from flask import request
+from flask import request, Response
 
 
 def with_error(error: str, code: int = 400) -> (str, int):
-    return json.dumps({
+    return Response(json.dumps({
         "message": error
-    }), code
+    }), content_type="application/json", status=code)
+
+
+def with_success(data: dict) -> Response:
+    data["message"] = "success"
+
+    return Response(json.dumps(data), content_type="application/json", status=200)
 
 
 def with_json_fields(fields: list[str]):
