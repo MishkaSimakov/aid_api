@@ -1,9 +1,9 @@
-from financial import MoexAPI
+from app.financial import MoexAPI
 import json
 import logging
 from datetime import datetime
 
-from financial.ticker import Ticker
+from app.financial.ticker import Ticker
 
 
 def tickers_data_loader():

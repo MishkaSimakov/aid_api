@@ -1,12 +1,13 @@
 import logging
+import os
 
 from flask import request
 import json
 from flask import Blueprint
-from financial.ticker import Ticker
+from app.financial.ticker import Ticker
 
-from config.categories import CategoriesConfig
-from utils import with_error, with_json_fields, with_success
+from app.utils import with_error, with_json_fields, with_success
+from app.financial.tickers_data_loader import tickers_data_loader
 
 blueprint = Blueprint('main', __name__)
 
@@ -19,6 +20,9 @@ def main():
         return with_error(f"Wrong category type. Available categories: {', '.join(Ticker.categories_list.keys())}")
 
     try:
+        if not os.path.isfile("storage/last_data"):
+            tickers_data_loader()
+
         with open("storage/last_data") as storage:
             values = json.loads(storage.readline())
     except Exception as e:

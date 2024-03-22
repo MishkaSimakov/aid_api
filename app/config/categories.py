@@ -1,5 +1,5 @@
 from datetime import timedelta
-from financial import StockDataInterval
+from app.financial import StockDataInterval
 
 
 class ChartConfig:

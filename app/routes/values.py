@@ -1,6 +1,6 @@
 from flask import Blueprint
-from financial.ticker import Ticker
-from utils import with_success
+from app.financial.ticker import Ticker
+from app.utils import with_success
 
 blueprint = Blueprint('values', __name__)
 

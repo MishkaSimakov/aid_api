@@ -1,5 +1,4 @@
 import sys
-
 import os
 
 INTERP = os.path.expanduser("/var/www/u2552113/data/aid/bin/python")
@@ -8,4 +7,4 @@ if sys.executable != INTERP:
 
 sys.path.append(os.getcwd())
 
-from app import application
+from server import application

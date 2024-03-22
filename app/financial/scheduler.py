@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from apscheduler.schedulers.background import BackgroundScheduler
 
-from financial.tickers_data_loader import tickers_data_loader
+from app.financial.tickers_data_loader import tickers_data_loader
 
 
 class Scheduler:

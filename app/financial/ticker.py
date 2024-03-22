@@ -1,6 +1,4 @@
-from dataclasses import dataclass
-
-from financial import Candle, MoexAPI, StockDataInterval
+from app.financial import Candle, MoexAPI, StockDataInterval
 from datetime import *
 import pandas as pd
 from typing import Optional
