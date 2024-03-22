@@ -3,6 +3,8 @@ from datetime import *
 import pandas as pd
 from typing import Optional
 from functools import wraps
+from technical_analysis import indicators
+from dataclasses import asdict
 
 
 def assure_candles_loaded(function):
@@ -24,6 +26,7 @@ def assure_candles_loaded(function):
 class Ticker:
     name: str
     daily_candles: Optional[list[Candle]]
+    candles_dataframe: pd.DataFrame
     categories_list = {}
 
     def __init__(self, name: str):
@@ -38,14 +41,15 @@ class Ticker:
         end_date = datetime.now()
         start_date = end_date - timedelta(days=365)
         self.daily_candles = MoexAPI().get_candles(self.name, start_date, end_date, StockDataInterval.DAY)
+        self.candles_dataframe = pd.DataFrame.from_records([asdict(candle) for candle in self.daily_candles])
 
     @assure_candles_loaded
     def moving_average(self, window: int) -> float:
-        return pd.Series(map(lambda candle: candle.close, self.daily_candles)).rolling(window=window).mean().iloc[-1]
+        return pd.Series(self.candles_dataframe.close).rolling(window=window).mean().iloc[-1]
 
     @assure_candles_loaded
     def exponential_moving_average(self, window: int) -> float:
-        return pd.Series(map(lambda candle: candle.close, self.daily_candles)).ewm(span=window).mean().iloc[-1]
+        return pd.Series(self.candles_dataframe.close).ewm(span=window).mean().iloc[-1]
 
     @assure_candles_loaded
     def get_return(self) -> Optional[float]:
@@ -56,6 +60,24 @@ class Ticker:
             return None
 
         return curr_day.close / prev_day.close - 1
+
+    @assure_candles_loaded
+    def indicator_atr(self, window):
+        return indicators.atr(self.candles_dataframe.high, self.candles_dataframe.low, self.candles_dataframe.close,
+                              period=window).iloc[-1]
+
+    @assure_candles_loaded
+    def indicator_rsi(self, window):
+        return indicators.rsi(self.candles_dataframe.close, period=window).iloc[-1]
+
+    @assure_candles_loaded
+    def indicator_perc_r(self, window):
+        return indicators.perc_r(self.candles_dataframe.high, self.candles_dataframe.low, self.candles_dataframe.close,
+                                 period=window).iloc[-1]
+
+    @assure_candles_loaded
+    def indicator_trix(self, window):
+        return indicators.trix(self.candles_dataframe.close, period=window).iloc[-1]
 
     def get_dividends(self):
         dividends = MoexAPI().get_dividends(self.name, timedelta(days=365))
@@ -76,11 +98,12 @@ class Ticker:
         return f"Ticker(name={self.name})"
 
 
+# rsi - %
 if not Ticker.categories_list:
     Ticker.categories_list = {
         "return": {
             "calculator": lambda ticker: ticker.get_return(),
-            "postfix": "%"
+            "postfix": "%",
         },
         "dividends": {
             "calculator": lambda ticker: ticker.get_dividends(),
@@ -88,6 +111,22 @@ if not Ticker.categories_list:
         },
         "relative_dividends": {
             "calculator": lambda ticker: ticker.get_relative_dividends(),
+            "postfix": "%"
+        },
+        "atr": {
+            "calculator": lambda ticker: ticker.indicator_atr(window=10),
+            "postfix": "%"
+        },
+        "rsi": {
+            "calculator": lambda ticker: ticker.indicator_rsi(window=10),
+            "postfix": "%"
+        },
+        "perc_r": {
+            "calculator": lambda ticker: ticker.indicator_perc_r(window=10),
+            "postfix": "%"
+        },
+        "trix": {
+            "calculator": lambda ticker: ticker.indicator_trix(window=10),
             "postfix": "%"
         }
     }
