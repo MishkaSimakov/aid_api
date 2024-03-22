@@ -52,7 +52,7 @@ class Ticker:
         return pd.Series(self.candles_dataframe.close).ewm(span=window).mean().iloc[-1]
 
     @assure_candles_loaded
-    def get_return(self) -> Optional[float]:
+    def get_profitability(self) -> Optional[float]:
         curr_day = self.daily_candles[-1]
         prev_day = self.daily_candles[-2]
 
@@ -98,36 +98,43 @@ class Ticker:
         return f"Ticker(name={self.name})"
 
 
-# rsi - %
 if not Ticker.categories_list:
+    # TODO: add descriptions for atr...
     Ticker.categories_list = {
-        "return": {
-            "calculator": lambda ticker: ticker.get_return(),
+        "profitability": {
+            "calculator": lambda ticker: ticker.get_profitability(),
             "postfix": "%",
+            "description": "Доходность за период"
         },
         "dividends": {
             "calculator": lambda ticker: ticker.get_dividends(),
-            "postfix": "₽"
+            "postfix": "₽",
+            "description": "Дивиденды за год"
         },
         "relative_dividends": {
             "calculator": lambda ticker: ticker.get_relative_dividends(),
-            "postfix": "%"
+            "postfix": "%",
+            "description": "Дивидендная доходность за год"
         },
         "atr": {
             "calculator": lambda ticker: ticker.indicator_atr(window=10),
-            "postfix": "%"
+            "postfix": "%",
+            "description": "yet to come"
         },
         "rsi": {
             "calculator": lambda ticker: ticker.indicator_rsi(window=10),
-            "postfix": "%"
+            "postfix": "%",
+            "description": "yet to come"
         },
         "perc_r": {
             "calculator": lambda ticker: ticker.indicator_perc_r(window=10),
-            "postfix": "%"
+            "postfix": "%",
+            "description": "yet to come"
         },
         "trix": {
             "calculator": lambda ticker: ticker.indicator_trix(window=10),
-            "postfix": "%"
+            "postfix": "%",
+            "description": "yet to come"
         }
     }
 
@@ -138,10 +145,12 @@ if not Ticker.categories_list:
         Ticker.categories_list["ma" + str(period)] = {
             "calculator": (lambda ticker, window=period: ticker.moving_average(window)),
             "postfix": "₽",
+            "description": f"Скользящее среднее за {period} дней"
         }
 
     for period in averages_periods:
         Ticker.categories_list["ema" + str(period)] = {
             "calculator": (lambda ticker, window=period: ticker.exponential_moving_average(window)),
             "postfix": "₽",
+            "description": f"Экспоненциальное скользящее среднее за {period} дней"
         }

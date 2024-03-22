@@ -7,7 +7,7 @@
 1. `/`: метод POST, принимает на вход JSON в формате:
     ```json
    {
-    "category": "return"   
+    "category": "profitability"   
    }
     ```
    Возвращает JSON в формате:
@@ -75,20 +75,23 @@
     {
       "ticker_full_name": "Сбербанк России ПАО ао",
       "items": {
-        "return": {
+        "profitability": {
             "value": 0.0017590149516271136,
             "postfix": "%",
-            "should_buy": false
+            "should_buy": false,
+            "description": "Доходность за период"
         },
         "dividends": {
             "value": 25,
             "postfix": "₽",
-            "should_buy": false
+            "should_buy": false,
+            "description": "Дивиденды за год"
         },
         "relative_dividends": {
             "value": 0.12323770087745242,
             "postfix": "%",
-            "should_buy": false
+            "should_buy": false,
+            "description": "Дивидендная доходность за год"
         }
       },
       "message": "success"

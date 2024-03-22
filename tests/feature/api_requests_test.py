@@ -4,7 +4,7 @@ from app.financial.ticker import Ticker
 
 
 def test_main_page_returns_categories_data(client):
-    response = client.post("/", data=json.dumps({"category": "return"}), headers={"Content-Type": "application/json"})
+    response = client.post("/", data=json.dumps({"category": "profitability"}), headers={"Content-Type": "application/json"})
     assert response.status_code == 200
     assert len(response.json["items"]) != 0
     assert "SBER" in response.json["items"]

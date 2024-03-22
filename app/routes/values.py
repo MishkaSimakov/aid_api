@@ -12,10 +12,12 @@ def details(ticker: str):
     full_name = ticker.get_full_name()
 
     values = {}
-    for category in Ticker.categories_list.keys():
-        values[category] = {
-            "value": Ticker.categories_list[category]["calculator"](ticker),
-            "postfix": Ticker.categories_list[category]["postfix"],
+    for category_name in Ticker.categories_list.keys():
+        category = Ticker.categories_list[category_name]
+        values[category_name] = {
+            "value": category["calculator"](ticker),
+            "postfix": category["postfix"],
+            "description": category["description"],
             "should_buy": False
         }
 

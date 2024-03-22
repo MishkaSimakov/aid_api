@@ -1,6 +1,6 @@
 from typing import Dict
 from app.utils import *
-from app.config.categories import ChartConfig
+from app.config import ChartConfig
 from datetime import datetime
 
 from flask import Blueprint
