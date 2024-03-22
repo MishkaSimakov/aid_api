@@ -11,7 +11,10 @@ blueprint = Blueprint('chart', __name__)
 
 def format_candle(candle: Candle) -> Dict[str, str]:
     return {
-        "value": candle.open,
+        "open": candle.open,
+        "close": candle.close,
+        "high": candle.high,
+        "low": candle.low,
         "begin": candle.begin.strftime('%Y-%m-%d %H:%M:%S'),
         "end": candle.end.strftime('%Y-%m-%d %H:%M:%S'),
     }

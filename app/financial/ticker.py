@@ -62,24 +62,24 @@ class Ticker:
         return curr_day.close / prev_day.close - 1
 
     @assure_candles_loaded
-    def indicator_atr(self, window):
+    def indicator_atr(self, window) -> float:
         return indicators.atr(self.candles_dataframe.high, self.candles_dataframe.low, self.candles_dataframe.close,
                               period=window).iloc[-1]
 
     @assure_candles_loaded
-    def indicator_rsi(self, window):
+    def indicator_rsi(self, window) -> float:
         return indicators.rsi(self.candles_dataframe.close, period=window).iloc[-1]
 
     @assure_candles_loaded
-    def indicator_perc_r(self, window):
+    def indicator_perc_r(self, window) -> float:
         return indicators.perc_r(self.candles_dataframe.high, self.candles_dataframe.low, self.candles_dataframe.close,
                                  period=window).iloc[-1]
 
     @assure_candles_loaded
-    def indicator_trix(self, window):
+    def indicator_trix(self, window) -> float:
         return indicators.trix(self.candles_dataframe.close, period=window).iloc[-1]
 
-    def get_dividends(self):
+    def get_dividends(self) -> float:
         dividends = MoexAPI().get_dividends(self.name, timedelta(days=365))
         return sum(map(lambda d: d.value, dividends))
 
