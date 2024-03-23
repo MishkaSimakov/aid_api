@@ -93,4 +93,17 @@
       "message": "success"
     }
     ```
+4. `/categories`: метод POST, ничего не принимает на вход.
+   Возвращает JSON в формате:
+   ```json
+   {
+	  "categories": [
+		  "profitability",
+		  "dividends",
+		  "relative_dividends",
+	   	  "atr"
+	  ],
+	  "message": "success"
+   }
+   ```
    
