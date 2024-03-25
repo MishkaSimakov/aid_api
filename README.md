@@ -70,11 +70,12 @@
     ```json
     {
       "ticker_full_name": "Сбербанк России ПАО ао",
+      "price": 123123.123,
       "items": {
         "profitability": {
             "value": 0.0017590149516271136,
             "postfix": "%",
-            "verdict": 2,
+            "verdict": 1,
             "description": "Доходность за период"
         },
         "dividends": {

@@ -27,20 +27,22 @@ def assure_candles_loaded(function):
 @dataclass
 class IndicatorCalculatorResponse:
     value: float
-    verdict: float
+    verdict: Optional[float]  # 1 - покупать, -1 - продавать
 
 
 @dataclass
 class TickerIndicator:
     calculator: Callable[['Ticker'], IndicatorCalculatorResponse]
-    description: str
+    name: str
     postfix: str
+    description: str = "Yet to come..."
 
     def calculate_for_ticker(self, ticker: 'Ticker') -> dict:
         result = self.calculator(ticker)
         return {
             "value": result.value if result is not None else None,
             "postfix": self.postfix,
+            "name": self.name,
             "description": self.description,
             "verdict": result.verdict if result is not None else None
         }
@@ -56,9 +58,15 @@ class Ticker:
         self.name = name
         self.daily_candles = None
 
-    def get_full_name(self) -> str:
-        data = MoexAPI().get_ticker_info(self.name)
-        return data[1][2]
+    @assure_candles_loaded
+    def get_current_price(self) -> float:
+        return self.daily_candles[-1].close
+
+    def get_names(self) -> (str, str):
+        ticker_info = MoexAPI().get_ticker_info(self.name)
+        short_name = ticker_info[2][2]
+        full_name = ticker_info[1][2]
+        return short_name, full_name
 
     def load_daily_candles(self):
         end_date = datetime.now()
@@ -68,16 +76,34 @@ class Ticker:
 
     @assure_candles_loaded
     def moving_average(self, window: int) -> Optional[IndicatorCalculatorResponse]:
+        value = pd.Series(self.candles_dataframe.close).rolling(window=window).mean().iloc[-1]
+        current_price = self.get_current_price()
+
+        verdict = 0
+        if value < current_price:
+            verdict = 1
+        elif value > current_price:
+            verdict = -1
+
         return IndicatorCalculatorResponse(
-            value=pd.Series(self.candles_dataframe.close).rolling(window=window).mean().iloc[-1],
-            verdict=0
+            value=verdict,
+            verdict=verdict
         )
 
     @assure_candles_loaded
     def exponential_moving_average(self, window: int) -> Optional[IndicatorCalculatorResponse]:
+        value = pd.Series(self.candles_dataframe.close).ewm(span=window).mean().iloc[-1]
+        current_price = self.get_current_price()
+
+        verdict = 0
+        if value < current_price:
+            verdict = 1
+        elif value > current_price:
+            verdict = -1
+
         return IndicatorCalculatorResponse(
             value=pd.Series(self.candles_dataframe.close).ewm(span=window).mean().iloc[-1],
-            verdict=0,
+            verdict=verdict,
         )
 
     @assure_candles_loaded
@@ -89,7 +115,7 @@ class Ticker:
             return None
 
         return IndicatorCalculatorResponse(
-            value=curr_day.close / prev_day.close - 1,
+            value=(curr_day.close / prev_day.close - 1) * 100,
             verdict=0,
         )
 
@@ -98,33 +124,54 @@ class Ticker:
         value = indicators.atr(self.candles_dataframe.high, self.candles_dataframe.low, self.candles_dataframe.close,
                                period=window).iloc[-1]
         return IndicatorCalculatorResponse(
-            value=value,
-            verdict=0,
+            value=value * 100,
+            verdict=None
         )
 
     @assure_candles_loaded
     def indicator_rsi(self, window) -> Optional[IndicatorCalculatorResponse]:
         value = indicators.rsi(self.candles_dataframe.close, period=window).iloc[-1]
+
+        verdict = 0
+        if value > 0.6:
+            verdict = 1
+        elif value < 0.4:
+            verdict = -1
+
         return IndicatorCalculatorResponse(
-            value=value,
-            verdict=0
+            value=value * 100,
+            verdict=verdict
         )
 
     @assure_candles_loaded
     def indicator_perc_r(self, window) -> Optional[IndicatorCalculatorResponse]:
         value = indicators.perc_r(self.candles_dataframe.high, self.candles_dataframe.low, self.candles_dataframe.close,
                                   period=window).iloc[-1]
+
+        verdict = 0
+        if value > 0.6:
+            verdict = -1
+        elif value < 0.4:
+            verdict = 1
+
         return IndicatorCalculatorResponse(
-            value=value,
-            verdict=0
+            value=value * -100,
+            verdict=verdict
         )
 
     @assure_candles_loaded
     def indicator_trix(self, window) -> Optional[IndicatorCalculatorResponse]:
         value = indicators.trix(self.candles_dataframe.close, period=window).iloc[-1]
+
+        verdict = 0
+        if value >= 0.01:
+            verdict = -1
+        elif value <= -0.01:
+            verdict = 1
+
         return IndicatorCalculatorResponse(
-            value=value,
-            verdict=0
+            value=value * 100,
+            verdict=verdict
         )
 
     def get_dividends(self) -> Optional[IndicatorCalculatorResponse]:
@@ -144,7 +191,7 @@ class Ticker:
             return None
 
         return IndicatorCalculatorResponse(
-            value=dividends_sum / self.daily_candles[0].open,
+            value=dividends_sum / self.daily_candles[0].open * 100,
             verdict=0,
         )
 
@@ -153,42 +200,41 @@ class Ticker:
 
 
 if not Ticker.categories_list:
-    # TODO: add descriptions for atr...
     Ticker.categories_list = {
         "profitability": TickerIndicator(
             calculator=lambda ticker: ticker.get_profitability(),
             postfix="%",
-            description="Доходность за период"
+            name="Доходность за день"
         ),
-        "dividends": TickerIndicator(
+        "abs-div": TickerIndicator(
             calculator=lambda ticker: ticker.get_dividends(),
             postfix="₽",
-            description="Дивиденды за год"
+            name="Дивиденды за год"
         ),
-        "relative_dividends": TickerIndicator(
+        "rel-div": TickerIndicator(
             calculator=lambda ticker: ticker.get_relative_dividends(),
             postfix="%",
-            description="Дивидендная доходность за год"
+            name="Дивидендная доходность за год"
         ),
         "atr": TickerIndicator(
             calculator=lambda ticker: ticker.indicator_atr(window=10),
             postfix="%",
-            description="yet to come"
+            name="Средний истинный диапазон"
         ),
         "rsi": TickerIndicator(
             calculator=lambda ticker: ticker.indicator_rsi(window=10),
             postfix="%",
-            description="yet to come"
+            name="Индекс относительной силы"
         ),
-        "perc_r": TickerIndicator(
+        "perc-r": TickerIndicator(
             calculator=lambda ticker: ticker.indicator_perc_r(window=10),
             postfix="%",
-            description="yet to come"
+            name="Процентный диапазон Вильямса"
         ),
         "trix": TickerIndicator(
             calculator=lambda ticker: ticker.indicator_trix(window=10),
             postfix="%",
-            description="yet to come"
+            name="Импульсный индикатор"
         )
     }
 
@@ -199,12 +245,12 @@ if not Ticker.categories_list:
         Ticker.categories_list["ma" + str(period)] = TickerIndicator(
             calculator=(lambda ticker, window=period: ticker.moving_average(window)),
             postfix="₽",
-            description=f"Скользящее среднее за {period} дней"
+            name=f"Скользящее среднее за {period} дней"
         )
 
     for period in averages_periods:
         Ticker.categories_list["ema" + str(period)] = TickerIndicator(
             calculator=(lambda ticker, window=period: ticker.exponential_moving_average(window)),
             postfix="₽",
-            description=f"Экспоненциальное скользящее среднее за {period} дней"
+            name=f"Экспоненциальное скользящее среднее за {period} дней"
         )

@@ -9,7 +9,7 @@ blueprint = Blueprint('values', __name__)
 def details(ticker: str):
     ticker = Ticker(name=ticker)
 
-    full_name = ticker.get_full_name()
+    short_name, full_name = ticker.get_names()
 
     values = {}
     for category_name in Ticker.categories_list.keys():
@@ -17,6 +17,7 @@ def details(ticker: str):
         values[category_name] = category.calculate_for_ticker(ticker)
 
     return with_success({
-        "ticker_full_name": full_name,
+        "short_name": short_name,
+        "full_name": full_name,
         "items": values
     })
