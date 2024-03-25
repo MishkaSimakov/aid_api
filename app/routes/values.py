@@ -5,7 +5,7 @@ from app.utils import with_success
 blueprint = Blueprint('values', __name__)
 
 
-@blueprint.route("/tickers/<ticker>/values", methods=["GET"])
+@blueprint.route("/tickers/<ticker>/values", methods=["POST"])
 def details(ticker: str):
     ticker = Ticker(name=ticker)
 

@@ -12,7 +12,7 @@ from app.financial.tickers_data_loader import tickers_data_loader
 blueprint = Blueprint('main', __name__)
 
 
-@blueprint.route("/", methods=["GET"])
+@blueprint.route("/", methods=["POST"])
 @with_json_fields(["category"])
 def main():
     category_name = request.json["category"]
