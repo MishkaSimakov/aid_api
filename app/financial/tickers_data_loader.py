@@ -23,7 +23,7 @@ def tickers_data_loader():
 
                 tickers_data[ticker.name][category_name] = result.value if result is not None else None
 
-        with open(Paths.storage_path, "w") as storage:
+        with open(Paths.last_data_path, "w") as storage:
             storage.write(json.dumps({
                 "tickers": tickers_data,
                 "updated_at": datetime.now().strftime('%Y-%m-%d %H:%M:%S')

@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, send_from_directory
 import logging
 
 from app.config import Paths
@@ -27,5 +27,9 @@ def create_app():
     @application.route("/")
     def ping():
         return "hello!", 200
+
+    @application.route('/images/<path:path>')
+    def send_images(path):
+        return send_from_directory("../" + Paths.images_path, path)
 
     return application
