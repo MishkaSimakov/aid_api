@@ -29,3 +29,8 @@ class ChartConfig:
             "interval": StockDataInterval.MONTH
         }
     }
+
+
+class Paths:
+    storage_path = "storage/last_data"
+    log_path = "storage/debug.log"

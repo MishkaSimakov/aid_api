@@ -4,6 +4,7 @@ import logging
 from datetime import datetime
 
 from app.financial.ticker import Ticker
+from app.config import Paths
 
 
 def tickers_data_loader():
@@ -18,11 +19,11 @@ def tickers_data_loader():
             tickers_data[ticker.name] = {}
 
             for category_name in Ticker.categories_list.keys():
-                value = Ticker.categories_list[category_name]["calculator"](ticker)
+                result = Ticker.categories_list[category_name].calculator(ticker)
 
-                tickers_data[ticker.name][category_name] = value
+                tickers_data[ticker.name][category_name] = result.value if result is not None else None
 
-        with open("storage/last_data", "w") as storage:
+        with open(Paths.storage_path, "w") as storage:
             storage.write(json.dumps({
                 "tickers": tickers_data,
                 "updated_at": datetime.now().strftime('%Y-%m-%d %H:%M:%S')

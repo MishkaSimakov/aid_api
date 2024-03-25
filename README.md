@@ -4,7 +4,7 @@
 
 Данные можно получать по двум адресам:
 
-1. `/`: метод POST, принимает на вход JSON в формате:
+1. `/`: метод GET, принимает на вход JSON в формате:
     ```json
    {
     "category": "profitability"   
@@ -35,10 +35,10 @@
 
    В `items` ключами являются компании для отображения на главной странице,
    `value` - показатель этой компании по категории, что передана в запросе.
-2. `/tickers/<ticker>/chart`: метод POST, принимает на вход JSON в формате:
+2. `/tickers/<ticker>/chart`: метод GET, принимает на вход JSON в формате:
    ```json
    {
-      "period": "1H"   
+      "period": "H"   
    }
    ```
    Возвращает JSON в формате:
@@ -65,7 +65,7 @@
     "message": "success"
    }
    ```
-3. `/tickers/<ticker>/values`: метод POST, ничего не принимает на вход.
+3. `/tickers/<ticker>/values`: метод GET, ничего не принимает на вход.
    Возвращает JSON в формате:
     ```json
     {
@@ -74,26 +74,26 @@
         "profitability": {
             "value": 0.0017590149516271136,
             "postfix": "%",
-            "should_buy": false,
+            "verdict": 2,
             "description": "Доходность за период"
         },
         "dividends": {
             "value": 25,
             "postfix": "₽",
-            "should_buy": false,
+            "verdict": 0,
             "description": "Дивиденды за год"
         },
         "relative_dividends": {
             "value": 0.12323770087745242,
             "postfix": "%",
-            "should_buy": false,
+            "verdict": -1,
             "description": "Дивидендная доходность за год"
         }
       },
       "message": "success"
     }
     ```
-4. `/categories`: метод POST, ничего не принимает на вход.
+4. `/categories`: метод GET, ничего не принимает на вход.
    Возвращает JSON в формате:
    ```json
    {

@@ -5,7 +5,7 @@ from app.utils import with_success
 blueprint = Blueprint('values', __name__)
 
 
-@blueprint.route("/tickers/<ticker>/values", methods=["POST"])
+@blueprint.route("/tickers/<ticker>/values", methods=["GET"])
 def details(ticker: str):
     ticker = Ticker(name=ticker)
 
@@ -14,12 +14,7 @@ def details(ticker: str):
     values = {}
     for category_name in Ticker.categories_list.keys():
         category = Ticker.categories_list[category_name]
-        values[category_name] = {
-            "value": category["calculator"](ticker),
-            "postfix": category["postfix"],
-            "description": category["description"],
-            "should_buy": False
-        }
+        values[category_name] = category.calculate_for_ticker(ticker)
 
     return with_success({
         "ticker_full_name": full_name,

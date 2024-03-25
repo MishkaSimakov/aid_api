@@ -20,7 +20,7 @@ def format_candle(candle: Candle) -> Dict[str, str]:
     }
 
 
-@blueprint.route("/tickers/<ticker>/chart", methods=["POST"])
+@blueprint.route("/tickers/<ticker>/chart", methods=["GET"])
 @with_json_fields(["period"])
 def chart(ticker: str):
     period = request.json["period"]

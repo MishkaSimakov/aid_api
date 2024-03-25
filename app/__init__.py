@@ -1,4 +1,7 @@
 from flask import Flask
+import logging
+
+from app.config import Paths
 from app.routes.main_page import blueprint as chart_blueprint
 from app.routes.values import blueprint as values_blueprint
 from app.routes.chart import blueprint as main_blueprint
@@ -6,10 +9,10 @@ from app.routes.categories import blueprint as categories_blueprint
 from app.financial.scheduler import Scheduler
 
 
-# logging.basicConfig(filename="../storage/debug.log", level=logging.DEBUG)
-
 def create_app():
     application = Flask(__name__)
+
+    logging.basicConfig(filename=Paths.log_path, level=logging.DEBUG)
 
     # register routes
     application.register_blueprint(chart_blueprint)
