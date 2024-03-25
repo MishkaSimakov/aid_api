@@ -86,7 +86,7 @@ class Ticker:
             verdict = -1
 
         return IndicatorCalculatorResponse(
-            value=verdict,
+            value=value,
             verdict=verdict
         )
 
@@ -102,7 +102,7 @@ class Ticker:
             verdict = -1
 
         return IndicatorCalculatorResponse(
-            value=pd.Series(self.candles_dataframe.close).ewm(span=window).mean().iloc[-1],
+            value=value,
             verdict=verdict,
         )
 
