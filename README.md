@@ -69,26 +69,16 @@
    Возвращает JSON в формате:
     ```json
     {
-      "ticker_full_name": "Сбербанк России ПАО ао",
+      "short_name": "Сбербанк",
+      "full_name": "Сбербанк России ПАО ао",
       "price": 123123.123,
       "items": {
         "profitability": {
-            "value": 0.0017590149516271136,
+            "value": 1.7590149516271136,
             "postfix": "%",
             "verdict": 1,
-            "description": "Доходность за период"
-        },
-        "dividends": {
-            "value": 25,
-            "postfix": "₽",
-            "verdict": 0,
-            "description": "Дивиденды за год"
-        },
-        "relative_dividends": {
-            "value": 0.12323770087745242,
-            "postfix": "%",
-            "verdict": -1,
-            "description": "Дивидендная доходность за год"
+            "name": "Доходность за период",
+            "description": "Это очень интересная величина, она считается так-то так-то..."
         }
       },
       "message": "success"

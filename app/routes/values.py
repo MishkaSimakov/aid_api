@@ -10,6 +10,7 @@ def details(ticker: str):
     ticker = Ticker(name=ticker)
 
     short_name, full_name = ticker.get_names()
+    current_price = ticker.get_current_price()
 
     values = {}
     for category_name in Ticker.categories_list.keys():
@@ -19,5 +20,6 @@ def details(ticker: str):
     return with_success({
         "short_name": short_name,
         "full_name": full_name,
+        "price": current_price,
         "items": values
     })
