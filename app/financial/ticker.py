@@ -204,7 +204,7 @@ if not Ticker.categories_list:
         "profitability": TickerIndicator(
             calculator=lambda ticker: ticker.get_profitability(),
             postfix="%",
-            name="Доходность за день"
+            name="Доходность за день",
         ),
         "abs-div": TickerIndicator(
             calculator=lambda ticker: ticker.get_dividends(),
@@ -248,9 +248,15 @@ if not Ticker.categories_list:
             name=f"Скользящее среднее за {period} дней"
         )
 
+        with open("storage/descriptions/ma.txt") as file:
+            Ticker.categories_list["ma" + str(period)].description = "".join(file.readlines())
+
     for period in averages_periods:
         Ticker.categories_list["ema" + str(period)] = TickerIndicator(
             calculator=(lambda ticker, window=period: ticker.exponential_moving_average(window)),
             postfix="₽",
             name=f"Экспоненциальное скользящее среднее за {period} дней"
         )
+
+        with open("storage/descriptions/ema.txt") as file:
+            Ticker.categories_list["ema" + str(period)].description = "".join(file.readlines())
