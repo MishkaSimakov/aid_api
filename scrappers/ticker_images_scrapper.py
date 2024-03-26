@@ -1,4 +1,6 @@
+import cairosvg
 import requests
+from cairosvg import svg2png
 
 
 def get_image_url(ticker_name: str) -> str:
@@ -20,5 +22,4 @@ for ticker in tickers:
 
     image_contents = response.content
 
-    with open(storage_path + ticker + ".svg", "+wb") as file:
-        file.write(image_contents)
+    svg2png(bytestring=image_contents, write_to=storage_path + ticker + ".png", output_width=512, output_height=512)
