@@ -4,3 +4,4 @@ urllib3==1.26.6
 requests~=2.31.0
 pandas
 technical-analysis
+cairosvg
