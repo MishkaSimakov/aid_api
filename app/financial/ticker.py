@@ -64,8 +64,14 @@ class Ticker:
 
     def get_names(self) -> (str, str):
         ticker_info = MoexAPI().get_ticker_info(self.name)
-        short_name = ticker_info[2][2]
-        full_name = ticker_info[1][2]
+
+        try:
+            short_name = ticker_info[2][2]
+            full_name = ticker_info[1][2]
+        except IndexError as e:
+            short_name = self.name
+            full_name = self.name
+
         return short_name, full_name
 
     def load_daily_candles(self):

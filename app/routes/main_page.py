@@ -35,11 +35,29 @@ def main():
     tickers_data = values["tickers"]
     for ticker in tickers_data:
         result[ticker] = {
-            "value": values["tickers"][ticker][category_name]
+            "value": values["tickers"][ticker][category_name],
         }
 
     return with_success({
-        "items": result,
+        "tickers": result,
+        "indices": {
+            "MOEX10": {
+                "name": "Индекс Мосбиржи",
+                "tickers": {
+                    "SBER": 12,
+                    "OZON": 38,
+                    "VKCO": 16
+                }
+            },
+            "MOEXRE": {
+                "name": "Ещё какой-то индекс",
+                "tickers": {
+                    "SBER": 31,
+                    "OZON": 12,
+                    "VKCO": 32
+                }
+            }
+        },
         "updated_at": values["updated_at"],
         "postfix": category.postfix
     })
