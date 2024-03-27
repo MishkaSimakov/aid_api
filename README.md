@@ -13,7 +13,7 @@
    Возвращает JSON в формате:
     ```json
     {
-       "items": {
+       "tickers": {
            "AFKS": {
                "value": -0.017018146150073576
            },
@@ -24,6 +24,24 @@
                "value": -0.005357394614408539
            }
        },
+        "indices": {
+            "MOEX10": {
+                "name": "Индекс Мосбиржи",
+                "tickers": {
+                    "SBER": 12,
+                    "OZON": 38,
+                    "VKCO": 16
+                }
+            },
+            "MOEXRE": {
+                "name": "Ещё какой-то индекс",
+                "tickers": {
+                    "SBER": 31,
+                    "OZON": 12,
+                    "VKCO": 32
+                }
+            }
+        },
        "updated_at": "2024-03-22 16:17:31",
        "postfix": "%",
        "message": "success"
