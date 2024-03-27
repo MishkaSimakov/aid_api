@@ -32,6 +32,7 @@ class ChartConfig:
 
 
 class Paths:
-    last_data_path = "storage/last_data"
+    tickers_data_path = "storage/tickers_data"
+    indices_data_path = "storage/indices_data"
     images_path = "storage/images"
     log_path = "storage/debug.log"

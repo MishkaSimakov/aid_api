@@ -4,6 +4,8 @@ import os
 from flask import request
 import json
 from flask import Blueprint
+
+from app import Paths
 from app.financial.ticker import Ticker
 
 from app.utils import with_error, with_json_fields, with_success
@@ -20,11 +22,17 @@ def main():
         return with_error(f"Wrong category type. Available categories: {', '.join(Ticker.categories_list.keys())}")
 
     try:
-        if not os.path.isfile("storage/last_data"):
-            tickers_data_loader()
+        with open(Paths.tickers_data_path) as storage:
+            data = json.loads(storage.readline())
+            tickers_data = data["tickers"]
+            updated_at = data["updated_at"]
+    except Exception as e:
+        logging.exception(e)
+        return with_error("Something wrong with internal files.", 500)
 
-        with open("storage/last_data") as storage:
-            values = json.loads(storage.readline())
+    try:
+        with open(Paths.indices_data_path) as storage:
+            indices_data = json.loads(storage.readline())["indices"]
     except Exception as e:
         logging.exception(e)
         return with_error("Something wrong with internal files.", 500)
@@ -32,32 +40,14 @@ def main():
     category = Ticker.categories_list[category_name]
 
     result = {}
-    tickers_data = values["tickers"]
     for ticker in tickers_data:
         result[ticker] = {
-            "value": values["tickers"][ticker][category_name],
+            "value": tickers_data[ticker][category_name],
         }
 
     return with_success({
         "tickers": result,
-        "indices": {
-            "MOEX10": {
-                "name": "Индекс Мосбиржи",
-                "tickers": {
-                    "SBER": 12,
-                    "OZON": 38,
-                    "VKCO": 16
-                }
-            },
-            "MOEXRE": {
-                "name": "Ещё какой-то индекс",
-                "tickers": {
-                    "SBER": 31,
-                    "OZON": 12,
-                    "VKCO": 32
-                }
-            }
-        },
-        "updated_at": values["updated_at"],
+        "indices": indices_data,
+        "updated_at": updated_at,
         "postfix": category.postfix
     })
