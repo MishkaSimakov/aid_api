@@ -242,7 +242,7 @@ if not Ticker.categories_list:
     # for more read: https://stackoverflow.com/questions/2295290/what-do-lambda-function-closures-capture
     averages_periods = [5, 10, 20, 50, 100, 200]
     for period in averages_periods:
-        Ticker.categories_list["ma" + str(period)] = TickerIndicator(
+        Ticker.categories_list["sma" + str(period)] = TickerIndicator(
             calculator=(lambda ticker, window=period: ticker.moving_average(window)),
             postfix="₽",
             name=f"Скользящее среднее за {period} дней"
@@ -256,8 +256,8 @@ if not Ticker.categories_list:
         )
 
     for category in Ticker.categories_list.keys():
-        if category.startswith("ma"):
-            filename = "ma"
+        if category.startswith("sma"):
+            filename = "sma"
         elif category.startswith("ema"):
             filename = "ema"
         else:
