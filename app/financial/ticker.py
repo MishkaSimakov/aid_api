@@ -248,9 +248,6 @@ if not Ticker.categories_list:
             name=f"Скользящее среднее за {period} дней"
         )
 
-        with open("storage/descriptions/ma.txt") as file:
-            Ticker.categories_list["ma" + str(period)].description = "".join(file.readlines())
-
     for period in averages_periods:
         Ticker.categories_list["ema" + str(period)] = TickerIndicator(
             calculator=(lambda ticker, window=period: ticker.exponential_moving_average(window)),
@@ -258,5 +255,13 @@ if not Ticker.categories_list:
             name=f"Экспоненциальное скользящее среднее за {period} дней"
         )
 
-        with open("storage/descriptions/ema.txt") as file:
-            Ticker.categories_list["ema" + str(period)].description = "".join(file.readlines())
+    for category in Ticker.categories_list.keys():
+        if category.startswith("ma"):
+            filename = "ma"
+        elif category.startswith("ema"):
+            filename = "ema"
+        else:
+            filename = category
+
+        with open(f"storage/descriptions/{filename}.txt") as file:
+            Ticker.categories_list[category].description = "".join(file.readlines())
