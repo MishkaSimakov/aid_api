@@ -10,9 +10,11 @@ class Scheduler:
     scheduler: BackgroundScheduler
 
     def __init__(self):
+        start = datetime.now() + timedelta(seconds=10)
+
         self.scheduler = BackgroundScheduler(daemon=True)
-        self.scheduler.add_job(tickers_data_loader, 'interval', minutes=10)
-        self.scheduler.add_job(indices_data_loader, 'interval', hours=1)
+        self.scheduler.add_job(tickers_data_loader, 'interval', minutes=10, start_date=start)
+        self.scheduler.add_job(indices_data_loader, 'interval', hours=1, start_date=start)
 
     def start(self):
         self.scheduler.start()
