@@ -81,7 +81,7 @@ class Ticker:
         curr_day = self.daily_candles[-1]
 
         return IndicatorCalculatorResponse(
-            value=curr_day.value,
+            value=curr_day.value / 1e6,
             verdict=None
         )
 
@@ -255,8 +255,8 @@ if not Ticker.categories_list:
         ),
         "value": TickerIndicator(
             calculator=lambda ticker: ticker.get_value(),
-            postfix="₽",
-            name="Оборот, ₽"
+            postfix="млн. ₽",
+            name="Оборот, млн. ₽"
         )
     }
 
