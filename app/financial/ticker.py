@@ -130,7 +130,7 @@ class Ticker:
         value = indicators.atr(self.candles_dataframe.high, self.candles_dataframe.low, self.candles_dataframe.close,
                                period=window).iloc[-1]
         return IndicatorCalculatorResponse(
-            value=value * 100,
+            value=value,
             verdict=None
         )
 
@@ -139,13 +139,13 @@ class Ticker:
         value = indicators.rsi(self.candles_dataframe.close, period=window).iloc[-1]
 
         verdict = 0
-        if value > 0.6:
+        if value > 60:
             verdict = 1
-        elif value < 0.4:
+        elif value < 40:
             verdict = -1
 
         return IndicatorCalculatorResponse(
-            value=value * 100,
+            value=value,
             verdict=verdict
         )
 
@@ -176,7 +176,7 @@ class Ticker:
             verdict = 1
 
         return IndicatorCalculatorResponse(
-            value=value * 100,
+            value=value,
             verdict=verdict
         )
 
@@ -224,7 +224,7 @@ if not Ticker.categories_list:
         ),
         "atr": TickerIndicator(
             calculator=lambda ticker: ticker.indicator_atr(window=10),
-            postfix="%",
+            postfix="",
             name="Средний истинный диапазон"
         ),
         "rsi": TickerIndicator(
