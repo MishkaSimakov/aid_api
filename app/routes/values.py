@@ -1,4 +1,5 @@
-from flask import Blueprint
+from flask import Blueprint, request
+
 from app.financial.ticker import Ticker
 from app.utils import with_success
 
@@ -7,7 +8,9 @@ blueprint = Blueprint('values', __name__)
 
 @blueprint.route("/tickers/<ticker>/values", methods=["POST"])
 def details(ticker: str):
-    ticker = Ticker(name=ticker)
+    lang = "ru"
+
+    ticker = Ticker(name=ticker, lang=lang)
 
     short_name, full_name = ticker.get_names()
     current_price = ticker.get_current_price()

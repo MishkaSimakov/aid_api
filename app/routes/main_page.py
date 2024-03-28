@@ -1,15 +1,10 @@
 import logging
-import os
-
-from flask import request
+from flask import request, Blueprint
 import json
-from flask import Blueprint
 
 from app import Paths
 from app.financial.ticker import Ticker
-
 from app.utils import with_error, with_json_fields, with_success
-from app.financial.tickers_data_loader import tickers_data_loader
 
 blueprint = Blueprint('main', __name__)
 

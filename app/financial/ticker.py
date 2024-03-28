@@ -35,7 +35,7 @@ class TickerIndicator:
     calculator: Callable[['Ticker'], IndicatorCalculatorResponse]
     name: str
     postfix: str
-    description: str = "Yet to come..."
+    description: str = ""
 
     def calculate_for_ticker(self, ticker: 'Ticker') -> dict:
         result = self.calculator(ticker)
@@ -50,13 +50,15 @@ class TickerIndicator:
 
 class Ticker:
     name: str
+    lang: str
     daily_candles: Optional[list[Candle]]
     candles_dataframe: pd.DataFrame
     categories_list: Dict[str, TickerIndicator] = {}
 
-    def __init__(self, name: str):
+    def __init__(self, name: str, lang: str):
         self.name = name
         self.daily_candles = None
+        self.lang = lang
 
     @assure_candles_loaded
     def get_current_price(self) -> float:
@@ -73,6 +75,15 @@ class Ticker:
             full_name = self.name
 
         return short_name, full_name
+
+    @assure_candles_loaded
+    def get_value(self) -> Optional[IndicatorCalculatorResponse]:
+        curr_day = self.daily_candles[-1]
+
+        return IndicatorCalculatorResponse(
+            value=curr_day.value,
+            verdict=None
+        )
 
     def load_daily_candles(self):
         end_date = datetime.now()
@@ -241,6 +252,11 @@ if not Ticker.categories_list:
             calculator=lambda ticker: ticker.indicator_trix(window=10),
             postfix="%",
             name="Импульсный индикатор"
+        ),
+        "value": TickerIndicator(
+            calculator=lambda ticker: ticker.get_value(),
+            postfix="₽",
+            name="Оборот, ₽"
         )
     }
 
@@ -269,5 +285,5 @@ if not Ticker.categories_list:
         else:
             filename = category
 
-        with open(f"storage/descriptions/{filename}.txt") as file:
+        with open(f"storage/descriptions/ru/{filename}.txt") as file:
             Ticker.categories_list[category].description = "".join(file.readlines())
