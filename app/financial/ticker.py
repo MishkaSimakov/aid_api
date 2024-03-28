@@ -176,7 +176,7 @@ class Ticker:
             verdict = 1
 
         return IndicatorCalculatorResponse(
-            value=value,
+            value=value * 100,
             verdict=verdict
         )
 
