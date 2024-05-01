@@ -255,7 +255,7 @@ if not Ticker.categories_list:
         ),
         "value": TickerIndicator(
             calculator=lambda ticker: ticker.get_value(),
-            postfix="млн. ₽",
+            postfix=" млн. ₽",
             name="Оборот, млн. ₽"
         )
     }
