@@ -1,5 +1,6 @@
 from datetime import timedelta
 from app.financial import StockDataInterval
+from pathlib import Path
 
 
 class ChartConfig:
@@ -40,6 +41,24 @@ class ChartConfig:
 class Paths:
     """Здесь заданы пути, которые используются программой."""
 
-    cache_data_path = "storage/cache"
-    images_path = "storage/images"
-    log_path = "storage/debug.log"
+    @staticmethod
+    def get_storage_path(relative_path: str) -> str:
+        """
+        Возвращает путь к файлу из папки storage, независимо от того,
+        из какой папки запущено приложение.
+        """
+
+        return str(Path(__file__).parents[2] / "storage" / relative_path)
+
+    @staticmethod
+    def get_client_path(relative_path: str) -> str:
+        """
+        Возвращает путь к файлу из папки client, независимо от того,
+        из какой папки запущено приложение.
+        """
+
+        return str(Path(__file__).parents[2] / "client" / relative_path)
+
+    cache_data_path = get_storage_path("cache")
+    images_path = get_storage_path("images")
+    log_path = get_storage_path("debug.log")

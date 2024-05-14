@@ -55,7 +55,7 @@ API работает на Python.
 
 Данные можно получать по двум адресам:
 
-1. `/`: метод POST, принимает на вход JSON в формате:
+1. `/api`: метод POST, принимает на вход JSON в формате:
     ```json
    {
     "category": "profitability"   
@@ -104,7 +104,7 @@ API работает на Python.
 
    В `items` ключами являются компании для отображения на главной странице,
    `value` - показатель этой компании по категории, что передана в запросе.
-2. `/tickers/<ticker>/chart`: метод POST, принимает на вход JSON в формате:
+2. `/api/tickers/<ticker>/chart`: метод POST, принимает на вход JSON в формате:
    ```json
    {
       "period": "H"   
@@ -134,7 +134,7 @@ API работает на Python.
     "message": "success"
    }
    ```
-3. `/tickers/<ticker>/values`: метод POST, ничего не принимает на вход.
+3. `/api/tickers/<ticker>/values`: метод POST, ничего не принимает на вход.
    Возвращает JSON в формате:
     ```json
     {
@@ -153,7 +153,7 @@ API работает на Python.
       "message": "success"
     }
     ```
-4. `/categories`: метод POST, ничего не принимает на вход.
+4. `/api/categories`: метод POST, ничего не принимает на вход.
    Возвращает JSON в формате:
    ```json
    {

@@ -14,21 +14,23 @@
               Индексы
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <template v-if="isLoadingIndices">
-                <li class="text-center w-100 dropdown-item disabled">
-                  <div class="spinner-border text-secondary"></div>
-                </li>
-              </template>
-              <template v-else-if="loadingState === LoadingState.ERROR">
-                <li class="text-center w-100 dropdown-item disabled text-danger">
-                  Не удалось загрузить индексы
-                </li>
-              </template>
-              <template v-else>
-                <li v-for="index in indices" v-bind:key="index.id">
-                  <RouterLink class="dropdown-item" :to="getIndexURL(index)">{{ index.id }}</RouterLink>
-                </li>
-              </template>
+              <LoadingWrapper :state="loadingState">
+                <template v-slot:loader>
+                  <li class="text-center w-100 dropdown-item disabled">
+                    <div class="spinner-border text-secondary"></div>
+                  </li>
+                </template>
+                <template v-slot:error>
+                  <li class="text-center w-100 dropdown-item disabled text-danger">
+                    Не удалось загрузить индексы
+                  </li>
+                </template>
+                <template v-slot:content>
+                  <li v-for="index in indices" v-bind:key="index.id">
+                    <RouterLink class="dropdown-item" :to="getIndexURL(index)">{{ index.id }}</RouterLink>
+                  </li>
+                </template>
+              </LoadingWrapper>
             </ul>
           </li>
         </ul>
@@ -41,20 +43,14 @@
 
 <script>
 import {createNamespacedHelpers} from "vuex";
-import {LoadingState} from "@/store/companies";
+import LoadingWrapper from "@/components/loading/LoadingWrapper.vue";
 
 const {mapState} = createNamespacedHelpers('companies');
 
 export default {
   name: 'App',
+  components: {LoadingWrapper},
   computed: {
-    LoadingState() {
-      return LoadingState;
-    },
-    isLoadingIndices() {
-      return this.loadingState === LoadingState.LOADING || this.loadingState === LoadingState.READY_TO_LOAD;
-    },
-
     ...mapState(['loadingState', 'indices']),
   },
   methods: {

@@ -1,11 +1,14 @@
-import {FinancialApi, TickerChartPeriod} from "@/api/api";
+import {FinancialApi} from "@/api/api";
+import {LoadingState} from "@/components/loading/LoadingState";
+import {TickerChartPeriod} from "@/api/TickerChartPeriod";
 
 const state = {
     identifier: "",
     shortName: "",
     fullName: "",
     chartData: [],
-    isLoading: true,
+    chartLoadingState: LoadingState.READY_TO_LOAD,
+    indicatorsLoadingState: LoadingState.READY_TO_LOAD,
     indicators: [],
     selectedPeriod: TickerChartPeriod.YEAR
 };
@@ -22,7 +25,9 @@ const getters = {
                         x: candle.begin,
                         y: candle.open
                     }
-                })
+                }),
+                cubicInterpolationMode: 'monotone',
+                tension: 0.4
             }]
         };
     },
@@ -52,27 +57,35 @@ const actions = {
         dispatch('fetchData');
     },
     fetchData({commit, state}) {
-        commit('setLoadingState', true);
+        if (state.loadingState === LoadingState.LOADING) {
+            return;
+        }
 
-        FinancialApi.fetchTickerChart(state.identifier, state.selectedPeriod)
+        commit('setChartLoadingState', LoadingState.LOADING);
+
+        FinancialApi.fetchTickerChart(state.identifier, state.selectedPeriod.alias)
             .then(chartData => {
-                commit('setChartData', chartData, state.selectedPeriod);
-                commit('setLoadingState', false);
+                commit('setChartData', chartData);
+                commit('setChartLoadingState', LoadingState.SUCCESS);
             })
             .catch(() => {
-                commit('setLoadingState', false);
+                commit('setChartLoadingState', LoadingState.ERROR);
             });
     },
     fetchIndicatorsData({commit, state}) {
-        commit('setLoadingState', true);
+        if (state.indicatorsLoadingState !== LoadingState.READY_TO_LOAD) {
+            return;
+        }
+
+        commit('setIndicatorsLoadingState', LoadingState.LOADING);
 
         FinancialApi.fetchTickerIndicators(state.identifier)
             .then(indicatorsData => {
                 commit('setIndicatorsData', indicatorsData);
-                commit('setLoadingState', false);
+                commit('setIndicatorsLoadingState', LoadingState.SUCCESS);
             })
             .catch(() => {
-                commit('setLoadingState', false);
+                commit('setIndicatorsLoadingState', LoadingState.ERROR);
             });
     }
 };
@@ -84,8 +97,11 @@ const mutations = {
     setChartData(state, chartData) {
         state.chartData = chartData.items;
     },
-    setLoadingState(state, isLoading) {
-        state.isLoading = isLoading;
+    setChartLoadingState(state, isLoading) {
+        state.chartLoadingState = isLoading;
+    },
+    setIndicatorsLoadingState(state, isLoading) {
+        state.indicatorsLoadingState = isLoading;
     },
     setIndicatorsData(state, indicatorsData) {
         state.shortName = indicatorsData.shortName;
@@ -98,8 +114,6 @@ const mutations = {
                 ...indicatorsData.items[key]
             });
         });
-
-        console.log(state.indicators);
     }
 };
 

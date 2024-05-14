@@ -1,3 +1,4 @@
+from app import Paths
 from app.financial import Candle, MoexAPI, StockDataInterval
 from datetime import *
 import pandas as pd
@@ -76,15 +77,16 @@ class Ticker:
     """Хранит и загружает данные о тикере."""
 
     name: str
-    lang: str
     daily_candles: Optional[list[Candle]]
     candles_dataframe: pd.DataFrame
     categories_list: Dict[str, TickerIndicator] = {}
 
-    def __init__(self, name: str, lang: str):
+    moex_api: MoexAPI
+
+    def __init__(self, name: str):
         self.name = name
         self.daily_candles = None
-        self.lang = lang
+        self.moex_api = MoexAPI()
 
     @assure_candles_loaded
     def get_current_price(self) -> float:
@@ -94,7 +96,7 @@ class Ticker:
     def get_names(self) -> (str, str):
         """Возвращает короткое и полное название для тикера."""
 
-        ticker_info = MoexAPI().get_ticker_info(self.name)
+        ticker_info = self.moex_api.get_ticker_info(self.name)
 
         try:
             short_name = ticker_info[2][2]
@@ -124,7 +126,8 @@ class Ticker:
 
         end_date = datetime.now()
         start_date = end_date - timedelta(days=365)
-        self.daily_candles = MoexAPI().get_candles(self.name, start_date, end_date, StockDataInterval.DAY)
+        self.daily_candles = self.moex_api.get_candles(self.name, start_date, end_date,
+                                                       StockDataInterval.DAY)
         self.candles_dataframe = pd.DataFrame.from_records([asdict(candle) for candle in self.daily_candles])
 
     @assure_candles_loaded
@@ -244,7 +247,7 @@ class Ticker:
     def get_dividends(self) -> Optional[IndicatorCalculatorResponse]:
         """Возвращает дивиденды по данному тикеру за год."""
 
-        dividends = MoexAPI().get_dividends(self.name, timedelta(days=365))
+        dividends = self.moex_api.get_dividends(self.name, timedelta(days=365))
         return IndicatorCalculatorResponse(
             value=sum(map(lambda d: d.value, dividends)),
             verdict=0
@@ -254,7 +257,7 @@ class Ticker:
     def get_relative_dividends(self) -> Optional[IndicatorCalculatorResponse]:
         """Индикатор, который возвращает дивиденды относительно цены данного тикера."""
 
-        dividends = MoexAPI().get_dividends(self.name, timedelta(days=365))
+        dividends = self.moex_api.get_dividends(self.name, timedelta(days=365))
         dividends_sum = sum(map(lambda d: d.value, dividends))
 
         if abs((datetime.now() - self.daily_candles[0].begin).days - 365) > 10:
@@ -338,5 +341,5 @@ if not Ticker.categories_list:
         else:
             filename = category
 
-        with open(f"storage/descriptions/{filename}.txt") as file:
+        with open(Paths.get_storage_path(f"descriptions/{filename}.txt")) as file:
             Ticker.categories_list[category].description = "".join(file.readlines())

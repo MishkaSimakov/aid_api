@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from apscheduler.schedulers.background import BackgroundScheduler
-from app.financial.cachable_data_sources.DataSourcesContainer import DataSourcesContainer
+from app.financial.DataSourcesContainer import DataSourcesContainer
 
 
 class Scheduler:

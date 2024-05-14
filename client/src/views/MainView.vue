@@ -1,34 +1,26 @@
 <template>
-  <div v-if="loadingState === LoadingState.LOADING" class="flex-grow-1 d-flex flex-column">
-    <div class="mx-auto my-auto spinner-border text-secondary"></div>
-  </div>
-  <TickersOverview
-      v-else-if="loadingState === LoadingState.SUCCESS"
-      :tickers="tickers"
-      focus="MOEX10"
-      :indices="indices"
-  >
-  </TickersOverview>
-  <div v-else class="flex-grow-1 d-flex flex-column">
-    <div class="mx-auto my-auto text-danger fw-bold">Ошибка при загрузке данных с сервера</div>
-  </div>
+  <LoadingWrapper :state="loadingState">
+    <template v-slot:content>
+      <TickersOverview
+          :tickers="tickers"
+          :indices="indices"
+      >
+      </TickersOverview>
+    </template>
+  </LoadingWrapper>
 </template>
 
 <script>
 import {createNamespacedHelpers} from "vuex";
 import TickersOverview from "@/components/overview/TickersOverview.vue";
-import {LoadingState} from "@/store/companies";
+import LoadingWrapper from "@/components/loading/LoadingWrapper.vue";
 
 const {mapState} = createNamespacedHelpers('companies');
 
 export default {
   name: 'MainView',
-  components: {TickersOverview},
+  components: {LoadingWrapper, TickersOverview},
   computed: {
-    LoadingState() {
-      return LoadingState
-    },
-
     ...mapState(['loadingState', 'tickers', 'indices']),
   },
   mounted() {

@@ -1,6 +1,6 @@
 import math
 import requests
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 from enum import Enum
 from typing import Dict, Optional
 from dataclasses import dataclass
@@ -82,8 +82,7 @@ class MoexAPI:
         return self.get_candles(ticker, start_date, end_date, StockDataInterval.DAY)
 
     def get_candles(self, ticker: str, start_date: datetime, end_date: datetime, interval: StockDataInterval,
-                    count: int = -1) \
-            -> Optional[list[Candle]]:
+                    count: int = -1) -> Optional[list[Candle]]:
         url = f"engines/stock/markets/shares/boards/TQBR/securities/{ticker}/candles.json"
         params = {
             'from': start_date.strftime('%Y-%m-%d %H:%M:%S'),

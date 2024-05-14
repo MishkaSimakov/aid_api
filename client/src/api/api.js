@@ -1,14 +1,5 @@
 const API_URL = 'http://localhost:8000'
 
-const TickerChartPeriod = {
-    HOUR: 'H',
-    DAY: 'D',
-    WEEK: 'W',
-    MONTH: 'M',
-    YEAR: 'Y',
-    ALL_TIME: 'A'
-}
-
 export const FinancialApi = {
     getAbsoluteURL(relative_url) {
         return new URL(relative_url, API_URL);
@@ -34,19 +25,19 @@ export const FinancialApi = {
     },
 
     fetchTickersData() {
-        return FinancialApi.fetchJSON('/', {
+        return FinancialApi.fetchJSON('/api', {
             'category': 'ema100'
         });
     },
 
     fetchTickerChart(tickerName, period) {
-        return FinancialApi.fetchJSON(`/tickers/${tickerName}/chart`, {
+        return FinancialApi.fetchJSON(`api/tickers/${tickerName}/chart`, {
             'period': period
         });
     },
 
     fetchTickerIndicators(tickerName) {
-        return FinancialApi.fetchJSON(`/tickers/${tickerName}/values`);
+        return FinancialApi.fetchJSON(`api/tickers/${tickerName}/values`);
     },
 
     getTickerImageURL(tickerName) {
@@ -55,8 +46,6 @@ export const FinancialApi = {
     },
 
     fetchCategories() {
-        return FinancialApi.fetchJSON(`/categories`);
+        return FinancialApi.fetchJSON(`/api/categories`);
     }
 };
-
-export {TickerChartPeriod};

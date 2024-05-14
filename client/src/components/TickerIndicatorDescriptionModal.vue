@@ -86,8 +86,6 @@ export default {
   },
   watch: {
     presentedIndicator(newValue) {
-      console.log(newValue);
-
       if (this.modal === undefined || newValue === undefined) {
         return;
       }

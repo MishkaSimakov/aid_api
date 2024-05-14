@@ -23,6 +23,11 @@ def format_candle(candle: Candle) -> Dict[str, str]:
 @blueprint.route("/tickers/<ticker>/chart", methods=["POST"])
 @with_json_fields(["period"])
 def chart(ticker: str):
+    """
+    Путь, по которому можно получить данные для графика за определённый период.
+    Для построения графика возвращается 30 равномерно распределённых значений из выбранного периода.
+    """
+
     period = request.json["period"]
 
     if period not in ChartConfig.periods:

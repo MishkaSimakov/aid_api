@@ -1,5 +1,5 @@
 from flask import request, Blueprint
-from app.financial.cachable_data_sources.DataSourcesContainer import DataSourcesContainer
+from app.financial.DataSourcesContainer import DataSourcesContainer
 from app.financial.ticker import Ticker
 from app.utils import with_error, with_json_fields, with_success
 
@@ -9,6 +9,12 @@ blueprint = Blueprint('main', __name__)
 @blueprint.route("/", methods=["POST"])
 @with_json_fields(["category"])
 def main():
+    """
+    Путь, по которому можно получить данные для главной страницы сайта.
+    Это значение данного параметра для всех доступных тикеров, а также
+    распределение тикеров по индексам.
+    """
+
     category_name = request.json["category"]
     if category_name not in Ticker.categories_list:
         return with_error(f"Wrong category type. Available categories: {', '.join(Ticker.categories_list.keys())}")

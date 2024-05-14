@@ -8,9 +8,9 @@ blueprint = Blueprint('values', __name__)
 
 @blueprint.route("/tickers/<ticker>/values", methods=["POST"])
 def details(ticker: str):
-    lang = "ru"
+    """Путь, по которому можно получить данные индикаторов для данного тикера."""
 
-    ticker = Ticker(name=ticker, lang=lang)
+    ticker = Ticker(name=ticker)
 
     short_name, full_name = ticker.get_names()
     current_price = ticker.get_current_price()
