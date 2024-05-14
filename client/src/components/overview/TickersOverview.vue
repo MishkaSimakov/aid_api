@@ -3,7 +3,6 @@
 </template>
 
 <script>
-
 import {animate} from "@/components/overview/animation";
 
 export default {
@@ -15,20 +14,14 @@ export default {
     }
   },
   mounted() {
-    // TODO: focus
-    this.$watch(
-        () => this.$route.query.index,
-        newIndex => {
-          this.scene?.transitionTo(newIndex, 1000);
-        }
-    )
-
     this.scene = animate('tickers-overview', this.tickers, this.indices, this.$router);
-    // this.scene?.transitionTo(this.$route.query.index ?? 'MOEX10', 0);
+    this.scene?.transitionTo(this.focus ?? 'MOEXIT', 0);
   },
+  watch: {
+    focus(newFocus) {
+      console.log(newFocus)
+      this.scene?.transitionTo(newFocus, 1000);
+    }
+  }
 }
 </script>
-
-<style scoped>
-
-</style>

@@ -4,6 +4,7 @@
       <TickersOverview
           :tickers="tickers"
           :indices="indices"
+          :focus="$route.query.index"
       >
       </TickersOverview>
     </template>

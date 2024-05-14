@@ -42,9 +42,6 @@ const getters = {
             sell: filteredIndicators.filter(indicator => indicator.verdict < 0)
         }
     },
-    notEnoughData(state) {
-        return state.chartData.length < 10;
-    }
 };
 
 const actions = {

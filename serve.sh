@@ -1,6 +1,7 @@
-#cd client
-#npm run build
-#cd ..
+cd client
+npm install
+npm run build
+cd ..
 
 source .venv/bin/activate
 pip install -r requirements/common.txt

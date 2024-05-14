@@ -2,11 +2,17 @@
   <div class="container-fluid my-3">
     <div class="row">
       <div class="mx-auto col-md-9">
-        <h1 class="d-block">{{ $route.params.ticker }}</h1>
+        <div class="text-center w-100">
+        <h1>{{ $route.params.ticker }}</h1>
+        </div>
 
         <section>
           <div class="card">
+            <div class="card-header">
+              Цена открытия, ₽
+            </div>
             <div class="card-body">
+
               <div class="btn-group w-100 mb-3">
                 <button
                     v-for="(parameters, period) in TickerChartPeriod"
@@ -38,8 +44,8 @@
 
           <LoadingWrapper :state="indicatorsLoadingState">
             <template v-slot:content>
-              <div class="row mt-3">
-                <div class="col-md-4" v-for="(group, key) in preparedIndicatorsData" v-bind:key="group">
+              <div class="row">
+                <div class="col-lg-4 col-md-8 mx-auto mt-3 mt-lg-0" v-for="(group, key) in preparedIndicatorsData" v-bind:key="group">
                   <div class="text-center w-100">
                     <h3 :class="indicatorGroupsParameters[key].className">
                       {{ indicatorGroupsParameters[key].title }}
@@ -55,7 +61,9 @@
                         class="list-group-item list-group-item-action container">
                       <div class="row">
                         <div class="col-md-8">{{ indicator.name }}</div>
-                        <div class="col-md-4 my-auto">{{ indicator.value.toFixed(2) + indicator.postfix }}</div>
+                        <div class="col-md-4 my-auto text-end">
+                          <span>{{ indicator.value.toFixed(2) + indicator.postfix }}</span>
+                        </div>
                       </div>
                     </li>
                   </ul>
