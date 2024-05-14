@@ -6,7 +6,7 @@ class ChartConfig:
     """
     Этот класс содержит доступные периоды для графика цен на тикер.
     В запросе приходит ключ (H, M, ...), а значения delta и interval используются
-    для составления запроса к Мосбирже
+    для составления запроса к Мосбирже.
     """
 
     periods = {
@@ -40,6 +40,6 @@ class ChartConfig:
 class Paths:
     """Здесь заданы пути, которые используются программой."""
 
-    cache_data_path = "storage/tickers_data"
+    cache_data_path = "storage/cache"
     images_path = "storage/images"
     log_path = "storage/debug.log"

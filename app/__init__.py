@@ -26,8 +26,8 @@ def create_app():
     application.register_blueprint(categories_blueprint)
 
     # register scheduler for loading data
-    # scheduler = Scheduler()
-    # scheduler.start()
+    scheduler = Scheduler()
+    scheduler.start()
 
     @application.route('/')
     @application.route('/tickers/<ticker>')

@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import Blueprint
 
 from app.financial.ticker import Ticker
 from app.utils import with_success

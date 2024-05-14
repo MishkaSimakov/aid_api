@@ -7,6 +7,8 @@ from dataclasses import dataclass
 
 
 class StockDataInterval(Enum):
+    """Этот класс хранит в себе интервалы времени, которые поддерживает api Мосбиржи."""
+
     MINUTE = 1
     TEN_MINUTES = 10
     HOUR = 60
@@ -18,6 +20,8 @@ class StockDataInterval(Enum):
 
 @dataclass
 class Candle:
+    """Хранит необходимые данные об одном временном промежутке."""
+
     open: float
     close: float
     high: float
@@ -29,6 +33,8 @@ class Candle:
 
     @staticmethod
     def from_array(data: list) -> 'Candle':
+        """Использует данные из массива для создания нового объекта Candle."""
+
         return Candle(data[0], data[1], data[2], data[3], data[4], data[5], datetime.fromisoformat(data[6]),
                       datetime.fromisoformat(data[7]))
 

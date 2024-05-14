@@ -2,30 +2,44 @@ import json
 import logging
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import TypeVar, Generic, Optional
-import uuid
+from typing import TypeVar, Generic, Optional, Tuple
 import os
-
-from app import Paths
 
 DataType = TypeVar('DataType')
 
 
 class CachableDataSource(ABC, Generic[DataType]):
-    cache_file_path: os.path
+    """
+    Этот абстрактный класс управляет данными, загружаемыми с сервера.
+    Он поддерживает кэширование данных в файл для более быстрого доступа.
+    """
 
-    def __init__(self):
-        self.cache_file_path = os.path.join(Paths.cache_data_path, uuid.uuid4().hex)
+    @staticmethod
+    @abstractmethod
+    def _get_cache_filepath() -> os.path:
+        """
+        Перегружается в реализациях, возвращает путь к файлу,
+        в котором будут храниться данные
+        """
+        pass
 
     @abstractmethod
     def _load_server_data(self) -> DataType:
+        """
+        Перегружается в реализациях, возвращает загруженные с сервера данные.
+        """
         pass
 
     def _has_cached_data(self) -> bool:
-        if not os.path.isfile(self.cache_file_path):
+        """
+        Проверяет, есть ли доступные данные в файле.
+        При этом проверяется лишь наличие данных, не их корректность.
+        """
+
+        if not os.path.isfile(self._get_cache_filepath()):
             return False
 
-        with open(self.cache_file_path, 'r') as storage:
+        with open(self._get_cache_filepath(), 'r') as storage:
             try:
                 json.loads(storage.readline())
             except:
@@ -33,9 +47,11 @@ class CachableDataSource(ABC, Generic[DataType]):
 
         return True
 
-    def _load_cached_data(self) -> Optional[(DataType, datetime)]:
+    def _load_cached_data(self) -> Optional[Tuple[DataType, datetime]]:
+        """Загружает закэшированные данные из файла."""
+
         try:
-            with open(self.cache_file_path, 'r') as storage:
+            with open(self._get_cache_filepath(), 'r') as storage:
                 content = json.loads(storage.readline())
 
                 return content["data"], content["updated_at"]
@@ -43,10 +59,12 @@ class CachableDataSource(ABC, Generic[DataType]):
             return None
 
     def cache_data(self, data: DataType):
-        logging.info(f"Start caching data into file {self.cache_file_path}.")
+        """Кэширует данные, загружая их в файл."""
+
+        logging.info(f"Start caching data into file {self._get_cache_filepath()}.")
 
         try:
-            with open(self.cache_file_path, "w") as storage:
+            with open(self._get_cache_filepath(), "w+") as storage:
                 storage.write(json.dumps({
                     "data": data,
                     "updated_at": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -56,11 +74,20 @@ class CachableDataSource(ABC, Generic[DataType]):
 
         logging.info("Finished caching data.")
 
-    def get_data(self) -> DataType:
-        if not self._has_cached_data():
-            data = self._load_server_data()
-            self.cache_data(data)
-        else:
-            data = self._load_cached_data()
+    def load_from_server_and_cache(self):
+        """Загружает данные с сервера и записывает их в файл."""
 
-        return data
+        data = self._load_server_data()
+        self.cache_data(data)
+
+    def get_data(self) -> Optional[Tuple[DataType, datetime]]:
+        """
+        Возвращает загруженные данные.
+        Если в файле с кэшем что-то есть - возвращает эти данные,
+        а иначе загружает данные с сервера и кэширует их.
+        """
+
+        if not self._has_cached_data():
+            self.load_from_server_and_cache()
+
+        return self._load_cached_data()

@@ -9,6 +9,11 @@ from dataclasses import dataclass
 
 
 def assure_candles_loaded(function):
+    """
+    Специальный декоратор для функций, которые используют данные о тикере.
+    Он проверяет, что данные загружены, а если это не так, то загружает их.
+    """
+
     @wraps(function)
     def wrapper(*args, **kwargs):
         ticker: 'Ticker' = args[0]
@@ -26,18 +31,37 @@ def assure_candles_loaded(function):
 
 @dataclass
 class IndicatorCalculatorResponse:
+    """
+    Для каждого тикера существует множество индикаторов - специальных значений,
+    которые показывают, стоит ли его покупать или продавать.
+    Этот класс хранит результат вычисления такого индикатора.
+    """
+
     value: float
     verdict: Optional[float]  # 1 - покупать, -1 - продавать
 
 
 @dataclass
 class TickerIndicator:
+    """
+    Хранит в себе данные об индикаторе:
+    calculator - функция, которая его вычисляет,
+    name - название,
+    postfix - постфикс, который должен быть добавлен к численному значению индикатора,
+    description - описание индикатора
+    """
+
     calculator: Callable[['Ticker'], IndicatorCalculatorResponse]
     name: str
     postfix: str
     description: str = ""
 
     def calculate_for_ticker(self, ticker: 'Ticker') -> dict:
+        """
+        Вычисляет значение индикатора для данного тикера и возвращает его в виде словаря,
+        который может быть передан клиенту.
+        """
+
         result = self.calculator(ticker)
         return {
             "value": result.value if result is not None else None,
@@ -49,6 +73,8 @@ class TickerIndicator:
 
 
 class Ticker:
+    """Хранит и загружает данные о тикере."""
+
     name: str
     lang: str
     daily_candles: Optional[list[Candle]]
@@ -62,9 +88,12 @@ class Ticker:
 
     @assure_candles_loaded
     def get_current_price(self) -> float:
+        """Возвращает последнюю известную цену на тикер - цену закрытия в последний промежуток времени."""
         return self.daily_candles[-1].close
 
     def get_names(self) -> (str, str):
+        """Возвращает короткое и полное название для тикера."""
+
         ticker_info = MoexAPI().get_ticker_info(self.name)
 
         try:
@@ -78,6 +107,8 @@ class Ticker:
 
     @assure_candles_loaded
     def get_value(self) -> Optional[IndicatorCalculatorResponse]:
+        """Индикатор, который возвращает оборот по данному тикеру за последний день."""
+
         curr_day = self.daily_candles[-1]
 
         return IndicatorCalculatorResponse(
@@ -86,6 +117,11 @@ class Ticker:
         )
 
     def load_daily_candles(self):
+        """
+        Загружает данные с api Мосбиржи для данного тикера с интервалом в один день,
+        эти данные потом используются для вычисления индикаторов.
+        """
+
         end_date = datetime.now()
         start_date = end_date - timedelta(days=365)
         self.daily_candles = MoexAPI().get_candles(self.name, start_date, end_date, StockDataInterval.DAY)
@@ -93,6 +129,8 @@ class Ticker:
 
     @assure_candles_loaded
     def moving_average(self, window: int) -> Optional[IndicatorCalculatorResponse]:
+        """Индикатор, который возвращает скользящее среднее с окном размера window."""
+
         value = pd.Series(self.candles_dataframe.close).rolling(window=window).mean().iloc[-1]
         current_price = self.get_current_price()
 
@@ -109,6 +147,8 @@ class Ticker:
 
     @assure_candles_loaded
     def exponential_moving_average(self, window: int) -> Optional[IndicatorCalculatorResponse]:
+        """Индикатор, который возвращает экспоненциальное скользящее среднее с окном размера window."""
+
         value = pd.Series(self.candles_dataframe.close).ewm(span=window).mean().iloc[-1]
         current_price = self.get_current_price()
 
@@ -125,6 +165,8 @@ class Ticker:
 
     @assure_candles_loaded
     def get_profitability(self) -> Optional[IndicatorCalculatorResponse]:
+        """Индикатор, который возвращает доходность тикера за день."""
+
         curr_day = self.daily_candles[-1]
         prev_day = self.daily_candles[-2]
 
@@ -138,6 +180,8 @@ class Ticker:
 
     @assure_candles_loaded
     def indicator_atr(self, window) -> Optional[IndicatorCalculatorResponse]:
+        """Индикатор, который возвращает средний истинный диапазон."""
+
         value = indicators.atr(self.candles_dataframe.high, self.candles_dataframe.low, self.candles_dataframe.close,
                                period=window).iloc[-1]
         return IndicatorCalculatorResponse(
@@ -147,6 +191,8 @@ class Ticker:
 
     @assure_candles_loaded
     def indicator_rsi(self, window) -> Optional[IndicatorCalculatorResponse]:
+        """Индикатор, который возвращает индекс относительной силы."""
+
         value = indicators.rsi(self.candles_dataframe.close, period=window).iloc[-1]
 
         verdict = 0
@@ -162,6 +208,8 @@ class Ticker:
 
     @assure_candles_loaded
     def indicator_perc_r(self, window) -> Optional[IndicatorCalculatorResponse]:
+        """Индикатор, который возвращает процентный диапазон Вильямса."""
+
         value = indicators.perc_r(self.candles_dataframe.high, self.candles_dataframe.low, self.candles_dataframe.close,
                                   period=window).iloc[-1]
 
@@ -178,6 +226,8 @@ class Ticker:
 
     @assure_candles_loaded
     def indicator_trix(self, window) -> Optional[IndicatorCalculatorResponse]:
+        """Считает импульсный индикатор."""
+
         value = indicators.trix(self.candles_dataframe.close, period=window).iloc[-1]
 
         verdict = 0
@@ -192,6 +242,8 @@ class Ticker:
         )
 
     def get_dividends(self) -> Optional[IndicatorCalculatorResponse]:
+        """Возвращает дивиденды по данному тикеру за год."""
+
         dividends = MoexAPI().get_dividends(self.name, timedelta(days=365))
         return IndicatorCalculatorResponse(
             value=sum(map(lambda d: d.value, dividends)),
@@ -200,10 +252,11 @@ class Ticker:
 
     @assure_candles_loaded
     def get_relative_dividends(self) -> Optional[IndicatorCalculatorResponse]:
+        """Индикатор, который возвращает дивиденды относительно цены данного тикера."""
+
         dividends = MoexAPI().get_dividends(self.name, timedelta(days=365))
         dividends_sum = sum(map(lambda d: d.value, dividends))
 
-        # candles start must be close to dividends period start
         if abs((datetime.now() - self.daily_candles[0].begin).days - 365) > 10:
             return None
 
@@ -285,5 +338,5 @@ if not Ticker.categories_list:
         else:
             filename = category
 
-        with open(f"storage/descriptions/ru/{filename}.txt") as file:
+        with open(f"storage/descriptions/{filename}.txt") as file:
             Ticker.categories_list[category].description = "".join(file.readlines())

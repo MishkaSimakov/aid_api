@@ -1,14 +1,28 @@
+import os
+
+from app import Paths
 from app.financial import MoexAPI
 from typing import Optional
 from app.financial.cachable_data_sources.CachableDataSource import CachableDataSource, DataType
 
 
 class IndicesDataSource(CachableDataSource):
+    """
+    Загружает данные об индексах с api Мосбиржи.
+    """
+
+    """Индексы, которые будут загружаться."""
     __required_indices = ['MOEX10', 'MOEXBC', 'MRBC', 'MOEXFN', 'MOEXOG', 'MOEXMM', 'MOEXIT', 'MOEXCN', 'MOEXRE',
                           'MOEXINN', 'MOEXTN', 'MOEXEU', 'MOEXTL', 'MICEXMNF']
 
     @staticmethod
+    def _get_cache_filepath() -> os.path:
+        return os.path.join(Paths.cache_data_path, 'indices')
+
+    @staticmethod
     def __get_names_for_indices(indices: list[str]) -> Optional[dict[str, str]]:
+        """Загружает полные названия для индексов."""
+
         url = f"statistics/engines/stock/markets/index/analytics.json"
 
         response = MoexAPI().request_with_retry(url)
@@ -29,6 +43,8 @@ class IndicesDataSource(CachableDataSource):
 
     @staticmethod
     def __get_tickers_for_index(index: str) -> Optional[dict[str, float]]:
+        """Загружает тикеры, которые входят в состав данного индекса."""
+
         url = f"statistics/engines/stock/markets/index/analytics/{index}.json"
 
         response = MoexAPI().request_with_retry(url)
