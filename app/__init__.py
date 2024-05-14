@@ -1,4 +1,6 @@
 from flask import Flask, send_from_directory
+from flask_cors import CORS, cross_origin
+
 import logging
 
 from app.config import Paths
@@ -12,7 +14,10 @@ from app.financial.scheduler import Scheduler
 def create_app():
     application = Flask(__name__)
 
-    logging.basicConfig(filename=Paths.log_path, level=logging.DEBUG)
+    CORS(application, origins=["http://localhost:8080"], send_wildcard=True)
+    logging.getLogger('flask_cors').level = logging.DEBUG
+
+    # logging.basicConfig(filename=Paths.log_path, level=logging.DEBUG)
 
     # register routes
     application.register_blueprint(chart_blueprint)
@@ -21,15 +26,20 @@ def create_app():
     application.register_blueprint(categories_blueprint)
 
     # register scheduler for loading data
-    scheduler = Scheduler()
-    scheduler.start()
+    # scheduler = Scheduler()
+    # scheduler.start()
 
-    @application.route("/")
-    def ping():
-        return "hello!", 200
+    @application.route('/')
+    @application.route('/tickers/<ticker>')
+    def main_page(**kwargs):
+        return send_from_directory("../client/dist", 'index.html')
 
     @application.route('/images/<path:path>')
     def send_images(path):
         return send_from_directory("../" + Paths.images_path, path)
+
+    @application.route('/<path:path>')
+    def send_static_files(path):
+        return send_from_directory("../client/dist", path)
 
     return application

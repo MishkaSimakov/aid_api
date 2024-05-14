@@ -3,6 +3,12 @@ from app.financial import StockDataInterval
 
 
 class ChartConfig:
+    """
+    Этот класс содержит доступные периоды для графика цен на тикер.
+    В запросе приходит ключ (H, M, ...), а значения delta и interval используются
+    для составления запроса к Мосбирже
+    """
+
     periods = {
         "H": {
             "delta": timedelta(hours=1),
@@ -32,7 +38,8 @@ class ChartConfig:
 
 
 class Paths:
-    tickers_data_path = "storage/tickers_data"
-    indices_data_path = "storage/indices_data"
+    """Здесь заданы пути, которые используются программой."""
+
+    cache_data_path = "storage/tickers_data"
     images_path = "storage/images"
     log_path = "storage/debug.log"

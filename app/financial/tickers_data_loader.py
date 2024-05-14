@@ -12,7 +12,7 @@ def tickers_data_loader():
 
     try:
         tickers_names = MoexAPI().get_tickers()
-        tickers = [Ticker(name) for name in tickers_names]
+        tickers = [Ticker(name, 'ru') for name in tickers_names]
         tickers_data = {}
 
         for ticker in tickers:

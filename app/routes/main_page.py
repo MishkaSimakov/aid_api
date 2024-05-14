@@ -25,12 +25,9 @@ def main():
         logging.exception(e)
         return with_error("Something wrong with internal files.", 500)
 
-    try:
-        with open(Paths.indices_data_path) as storage:
-            indices_data = json.loads(storage.readline())["indices"]
-    except Exception as e:
-        logging.exception(e)
-        return with_error("Something wrong with internal files.", 500)
+
+    indices_data = json.loads(storage.readline())["indices"]
+    return with_error("Something wrong with internal files.", 500)
 
     category = Ticker.categories_list[category_name]
 

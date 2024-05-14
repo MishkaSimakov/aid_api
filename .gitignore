@@ -6,3 +6,4 @@ storage/*
 !storage/descriptions
 
 **/.ipynb_checkpoints
+**/.DS_Store
