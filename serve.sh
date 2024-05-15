@@ -5,4 +5,4 @@ cd ..
 
 source .venv/bin/activate
 pip install -r requirements/common.txt
-flask --app server.py --debug run --port 8000
+flask --app server.py run --port 8000
