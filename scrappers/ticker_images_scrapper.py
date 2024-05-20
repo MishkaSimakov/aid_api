@@ -1,6 +1,9 @@
-import cairosvg
 import requests
 from cairosvg import svg2png
+
+"""
+Этот скрипт загружает изображения для тикеров с сайта с финансами и сохраняет их в локальную папку.
+"""
 
 
 def get_image_url(ticker_name: str) -> str:

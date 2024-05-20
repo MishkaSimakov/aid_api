@@ -1,12 +1,14 @@
 import math
 import requests
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 from enum import Enum
 from typing import Dict, Optional
 from dataclasses import dataclass
 
 
 class StockDataInterval(Enum):
+    """Этот класс хранит в себе интервалы времени, которые поддерживает api Мосбиржи."""
+
     MINUTE = 1
     TEN_MINUTES = 10
     HOUR = 60
@@ -18,6 +20,8 @@ class StockDataInterval(Enum):
 
 @dataclass
 class Candle:
+    """Хранит необходимые данные об одном временном промежутке."""
+
     open: float
     close: float
     high: float
@@ -29,6 +33,8 @@ class Candle:
 
     @staticmethod
     def from_array(data: list) -> 'Candle':
+        """Использует данные из массива для создания нового объекта Candle."""
+
         return Candle(data[0], data[1], data[2], data[3], data[4], data[5], datetime.fromisoformat(data[6]),
                       datetime.fromisoformat(data[7]))
 
@@ -76,8 +82,7 @@ class MoexAPI:
         return self.get_candles(ticker, start_date, end_date, StockDataInterval.DAY)
 
     def get_candles(self, ticker: str, start_date: datetime, end_date: datetime, interval: StockDataInterval,
-                    count: int = -1) \
-            -> Optional[list[Candle]]:
+                    count: int = -1) -> Optional[list[Candle]]:
         url = f"engines/stock/markets/shares/boards/TQBR/securities/{ticker}/candles.json"
         params = {
             'from': start_date.strftime('%Y-%m-%d %H:%M:%S'),

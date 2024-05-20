@@ -1,8 +1,15 @@
 from datetime import timedelta
 from app.financial import StockDataInterval
+from pathlib import Path
 
 
 class ChartConfig:
+    """
+    Этот класс содержит доступные периоды для графика цен на тикер.
+    В запросе приходит ключ (H, M, ...), а значения delta и interval используются
+    для составления запроса к Мосбирже.
+    """
+
     periods = {
         "H": {
             "delta": timedelta(hours=1),
@@ -32,7 +39,26 @@ class ChartConfig:
 
 
 class Paths:
-    tickers_data_path = "storage/tickers_data"
-    indices_data_path = "storage/indices_data"
-    images_path = "storage/images"
-    log_path = "storage/debug.log"
+    """Здесь заданы пути, которые используются программой."""
+
+    @staticmethod
+    def get_storage_path(relative_path: str) -> str:
+        """
+        Возвращает путь к файлу из папки storage, независимо от того,
+        из какой папки запущено приложение.
+        """
+
+        return str(Path(__file__).parents[2] / "storage" / relative_path)
+
+    @staticmethod
+    def get_client_path(relative_path: str) -> str:
+        """
+        Возвращает путь к файлу из папки client, независимо от того,
+        из какой папки запущено приложение.
+        """
+
+        return str(Path(__file__).parents[2] / "client" / relative_path)
+
+    cache_data_path = get_storage_path("cache")
+    images_path = get_storage_path("images")
+    log_path = get_storage_path("debug.log")

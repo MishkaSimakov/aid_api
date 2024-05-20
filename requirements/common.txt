@@ -5,3 +5,4 @@ requests~=2.31.0
 pandas
 technical-analysis
 cairosvg
+flask-cors

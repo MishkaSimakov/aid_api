@@ -1,8 +1,11 @@
 .idea
+.venv
 **/__pycache__
 
 storage/*
 !storage/.gitkeep
+!storage/cache/.gitkeep
 !storage/descriptions
 
 **/.ipynb_checkpoints
+**/.DS_Store
